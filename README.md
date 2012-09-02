@@ -1,5 +1,4 @@
-Completed exercises as I go through books:
+Completed programming exercises from:
 
- * *Learn You a Haskell for Great Good!*
- * *Programming in Haskell*
- * *Real World Haskell*
+ - *Learn You a Haskell for Great Good!*
+ - *Programming in Haskell*
