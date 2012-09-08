@@ -1,4 +1,4 @@
-def sortInPlace(xs: Array[Int]) {
+def sort(xs: Array[Int]) {
   def swap(i: Int, j: Int) {
     val x = xs(i)
     xs(i) = xs(j)
@@ -25,13 +25,9 @@ def sortInPlace(xs: Array[Int]) {
     sort1(0, xs.length - 1)
 }
 
-def sortFunctional(xs: Array[Int]): Array[Int] = {
-  if (xs.length <= 1) xs
-  else {
-    val pivot = xs(xs.length / 2)
-    Array.concat(
-      sortFunctional(xs filter (pivot >)),
-      xs filter (pivot ==),
-      sortFunctional(xs filter (pivot <)))
-  }
-}
+def data = Array(1, 9, 5, 6, 2, 7, 8, 4, 3)
+
+val a = data
+println(a.mkString(", "))
+sort(a)
+println(a.mkString(", "))
