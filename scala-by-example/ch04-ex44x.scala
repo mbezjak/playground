@@ -1,5 +1,5 @@
-def abs(x: Double) = if (x >= 0) x else -x
 def square(x: Double) = x * x
+def abs(x: Double)    = if (x >= 0) x else -x
 
 def improve(guess: Double, x: Double) =
   (guess + x / guess) / 2
@@ -7,11 +7,11 @@ def improve(guess: Double, x: Double) =
 def isGoodEnough(guess: Double, x: Double) =
   abs(square(guess) - x) < 0.001
 
-def isGoodEnough2(guess: Double, x: Double) =
-  abs(square(guess) - x) < math.ulp(x)
+def isGoodEnoughImproved(guess: Double, x: Double) =
+  abs(square(guess) - x) <= math.ulp(x)
 
 def sqrtIter(guess: Double, x: Double): Double = {
-  if (isGoodEnough2(guess, x)) guess
+  if (isGoodEnoughImproved(guess, x)) guess
   else sqrtIter(improve(guess, x), x)
 }
 
