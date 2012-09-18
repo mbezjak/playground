@@ -8,7 +8,7 @@ def isGoodEnough(guess: Double, x: Double) =
   abs(square(guess) - x) < 0.001
 
 def isGoodEnoughImproved(guess: Double, x: Double) =
-  abs(square(guess) - x) <= math.ulp(x)
+  abs(square(guess) - x) / x <= 1e-3
 
 def sqrtIter(guess: Double, x: Double): Double = {
   if (isGoodEnoughImproved(guess, x)) guess
