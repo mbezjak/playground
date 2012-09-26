@@ -3,7 +3,7 @@ import math.abs
 
 val tolerance = 1e-4
 def isCloseEnough(x: Double, y: Double): Boolean =
-  abs((x - y) / x) < tolerance
+  abs((x - y) / x) / x < tolerance
 
 def fixedPoint(f: Double => Double)(firstGuess: Double) = {
   @tailrec def iterate(guess: Double): Double = {
