@@ -45,3 +45,5 @@ import holder._
 // +---+---+---+---+
 // |   |   | x |   |
 // +---+---+---+---+
+
+println("solutions for 4x4 = " + queens(4))
