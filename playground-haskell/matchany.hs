@@ -1,32 +1,38 @@
-data Action = Match String | ConsumeAny deriving (Show)
+import Data.List (stripPrefix,groupBy)
+import Control.Applicative ((<|>))
+
+data Action = Match String
+            | MatchAny deriving (Show)
 
 match :: String -> String -> Bool
-match str pattern = matchAction str (actions pattern)
+match string pattern =
+  consume (Just string) (actions . distinguish $ pattern) == Just ""
 
-matchAction :: String -> [Action] -> Bool
-matchAction str [] = null str
-matchAction "" [ConsumeAny] = True
-matchAction "" (_:_) = False
-matchAction str (Match s : as) =
-  case consume str s of
-    Nothing        -> False
-    Just (_, rest) -> matchAction rest as
-matchAction str all@(ConsumeAny:as) =
-  (matchAction str as) || (matchAction (tail str) all)
+consume :: Maybe String -> [Action] -> Maybe String
+consume Nothing _              = Nothing
+consume m []                   = m >>= \s -> if null s then m else Nothing
+consume m [MatchAny]           = m >> return ""
+consume m (Match p : as)       = consume (m >>= stripPrefix p) as
+consume m as@(MatchAny : rest) = consume m rest <|> consume (m >>= maybeTail) as
 
-consume :: String -> String -> Maybe (String, String)
-consume str exact =
-  if (fst ms) == exact then Just ms else Nothing
-  where ms = splitAt (length exact) str
+actions :: [String] -> [Action]
+actions = foldr action []
+  where action "*" = (MatchAny:)
+        action x   = (Match x:)
 
-actions :: String -> [Action]
-actions ""       = []
-actions ('*':xs) = ConsumeAny : actions xs
-actions xs       = Match (fst ms) : actions (snd ms)
-  where ms = span (/='*') xs
+distinguish :: String -> [String]
+distinguish = groupBy (\a b -> a /= '*' && b /= '*')
 
+maybeTail :: [a] -> Maybe [a]
+maybeTail []     = Nothing
+maybeTail (_:xs) = Just xs
 
-tests = and [ match "foo" "foo"
+tests :: Bool
+tests = and . map snd $ testCases
+
+testCases :: [(Int,Bool)]
+testCases =
+  zip [0..] [ match "foo" "foo"
             , not $ match "foox" "foo"
             , not $ match "foo" "foox"
             , match "foo" "foo*"
