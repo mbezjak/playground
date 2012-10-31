@@ -30,5 +30,5 @@ popstat xs = (mean xs, var pop, stddev pop)
   where pop = Population xs
 
 samplestat :: (Real a, Floating a) => [a] -> (a, a, a)
-samplestat xs = (mean xs, var pop, stddev pop)
-  where pop = Sample xs
+samplestat xs = (mean xs, var sample, stddev sample)
+  where sample = Sample xs
