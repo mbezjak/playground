@@ -1,3 +1,6 @@
+// Not currently implemented because I don't have the time to sit down and
+// reason through the exercise.
+
 abstract class Term
 case class Var(x: String) extends Term {
   override def toString = x
