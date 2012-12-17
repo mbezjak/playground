@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# used instead of sysctl
+
+set -o errexit
+
+perf=/tmp/stub-file-replaces-sysctl-setperf-calls
+cpu=/tmp/stub-file-replaces-sysctl-cpuspeed-calls
+
+readcpu()   { cat $cpu;  }
+readperf()  { cat $perf; }
+writeperf() {
+    [[ $1 == "100" ]] && speed=2660 || speed=1000
+    echo "hw.setperf=$1" > $perf
+    echo "hw.cpuspeed=$speed" > $cpu
+    readperf
+}
+
+show()  { ls -l $1; cat $1; }
+setup() {
+    sudo rm -f $perf $cpu
+    writeperf 100
+    sudo chown root:root $perf $cpu
+    show $perf
+    show $cpu
+}
+
+case $1 in
+    setup)       setup    ;;
+    hw.setperf)  readperf ;;
+    hw.cpuspeed) readcpu  ;;
+    -w)          writeperf $3 ;;
+    *)           echo "unknown: $1" ;;
+esac
+
+exit 0
