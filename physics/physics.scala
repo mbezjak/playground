@@ -1,7 +1,9 @@
 import math._
 
-val c  = 2.99792458e8     // m/s
 val AU = 1.49597870691e11 // m
+val ly = 9.460536207e15   // m - light year
+
+val c  = 2.99792458e8     // m/s
 val G  = 6.673e-11        // m^3 kg^-1 s^-2
 val me = 9.109382e-31     // kg - electron mass
 val mp = 1.6726217e-27    // kg - proton mass
