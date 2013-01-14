@@ -13,3 +13,5 @@ val Kb = 1.380648e-23     // J/K - boltzmann constant
 // astronomical
 val Msun = 1.9891e30    // kg
 val Rsun = 6.95508e8    // m
+val Lsun = 3.83e26      // W
+val bsun = 1370         // W m^-2 - solar constant
