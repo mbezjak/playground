@@ -1,7 +1,12 @@
 import math._
 
-val AU = 1.49597870691e11 // m
-val ly = 9.460536207e15   // m - light year
+val AU  = 1.49597870691e11  // m
+val ly  = 9.460536207e15    // m - light year
+val yr  = 365.2564          // days - sidereal year
+val y2s = yr * 24 * 60 * 60 // s - seconds in a year
+val ec  = 1.6021765e-19     // C - elementary charge
+val tnt = 4.2e6             // J - explosion of a kg of TNT
+val amu = 1.66053886e-27    // kg - atomic mass unit
 
 val c  = 2.99792458e8     // m/s
 val G  = 6.673e-11        // m^3 kg^-1 s^-2
