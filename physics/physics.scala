@@ -1,6 +1,7 @@
 import math._
 
 val AU  = 1.49597870691e11  // m
+val pc  = 206265 * AU       // m - parsec
 val ly  = 9.460536207e15    // m - light year
 val yr  = 365.2564          // days - sidereal year
 val y2s = yr * 24 * 60 * 60 // s - seconds in a year
