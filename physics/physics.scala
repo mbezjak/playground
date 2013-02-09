@@ -18,6 +18,7 @@ val ma = 6.64465675e-27   // kg - alpha particle mass
 val b  = 0.0028977685     // m K - wien's constant
 val kb = 1.380648e-23     // J/K - boltzmann constant
 val sigma = 5.6703e-8     // W m^-2 K^-4 - stafan-boltzmann constant
+val h  = 6.626069e-34     // J s - planck constant
 
 // astronomical
 val Msun = 1.9891e30    // kg
