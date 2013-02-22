@@ -7,3 +7,4 @@ Completed programming exercises from:
  - [Twitter Scala School](http://twitter.github.com/scala_school)
  - [Practical Haskell: scripting with types](http://donsbot.wordpress.com/2010/08/17/practical-haskell)
  - [CSSBasics](http://www.cssbasics.com)
+ - [99 Haskell Problems](http://www.haskell.org/haskellwiki/H-99:_Ninety-Nine_Haskell_Problems)
