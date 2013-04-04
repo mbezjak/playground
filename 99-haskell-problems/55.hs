@@ -1,23 +1,29 @@
 data Tree a = Empty | Branch a (Tree a) (Tree a)
-            deriving (Show, Eq)
+            deriving Eq
+
+instance Show a => Show (Tree a) where
+  show Empty = ""
+  show (Branch x Empty Empty) = show x
+  show (Branch x l Empty)     = show x ++ " " ++ show l ++ " -"
+  show (Branch x Empty r)     = show x ++ " - " ++ show r
+  show (Branch x l r)         = show x ++ " (" ++ show l ++ ") (" ++ show r ++ ")"
 
 leaf :: a -> Tree a
 leaf x = Branch x Empty Empty
 
 
-tree1 :: Tree Char
-tree1 = Branch 'a' (Branch 'b' (leaf 'd')
-                               (leaf 'e'))
-                   (Branch 'c' Empty
-                               (Branch 'f' (leaf 'g')
-                                           Empty))
+mkLeaf :: Tree Char
+mkLeaf = leaf 'x'
 
-tree2 :: Tree Char
-tree2 = leaf 'a'
+mkNode :: Tree Char -> Tree Char -> Tree Char
+mkNode = Branch 'x'
 
-tree3 :: Tree a
-tree3 = Empty
-
-tree4 :: Tree Int
-tree4 = Branch 1 (Branch 2 Empty (leaf 4))
-                 (leaf 2)
+cbalTree :: Int -> [Tree Char]
+cbalTree 0 = []
+cbalTree 1 = [mkLeaf]
+cbalTree 2 = [mkNode mkLeaf Empty, mkNode Empty mkLeaf]
+cbalTree n | rem == 0  = [mkNode l r | l <- cbalTree half, r <- cbalTree half]
+           | otherwise =
+  [mkNode l r | l <- cbalTree (half+rem), r <- cbalTree half] ++
+  [mkNode l r | l <- cbalTree half, r <- cbalTree (half+rem)]
+  where (half, rem) = (n-1) `quotRem` 2
