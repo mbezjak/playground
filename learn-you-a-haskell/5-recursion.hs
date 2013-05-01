@@ -24,7 +24,7 @@ maximum5 [] = error "Empty list"
 maximum5 [x] = x
 maximum5 (x:xs) = max x (maximum5 xs)
 
-replicate' n e 
+replicate' n e
   | n <= 0    = []
   | otherwise = [e] ++ replicate' (n-1) e
 
