@@ -20,7 +20,7 @@ findByKey' :: Eq k => k -> [(k,v)] -> Maybe v
 findByKey' _ [] = Nothing
 findByKey' key ((k,v):xs)
   | key == k = Just v
-  | otherwise = findByKey key xs
+  | otherwise = findByKey' key xs
 
 findByKey2 :: Eq k => k -> [(k,v)] -> Maybe v
 findByKey2 key = foldr (\(k,v) acc -> if k == key then Just v else acc) Nothing
