@@ -7,13 +7,13 @@ type PhoneBook = [(Name, PhoneNumber)]
 inPhoneBook :: Name -> PhoneNumber -> PhoneBook -> Bool
 inPhoneBook name pnumber pbook = (name,pnumber) `elem` pbook
 
-phoneBook =      
-    [("betty","555-2938")     
-    ,("bonnie","452-2928")     
-    ,("patsy","493-2928")     
-    ,("lucille","205-2928")     
-    ,("wendy","939-8282")     
-    ,("penny","853-2492")     
+phoneBook =
+    [("betty","555-2938")
+    ,("bonnie","452-2928")
+    ,("patsy","493-2928")
+    ,("lucille","205-2928")
+    ,("wendy","939-8282")
+    ,("penny","853-2492")
     ]
 
 type AssocList k v = [(k,v)]
@@ -35,7 +35,7 @@ lockerLookup lockerNumber map =
                           else Left $ "Locker " ++ show lockerNumber ++ " is already taken!"
 
 lockers :: LockerMap
-lockers = Map.fromList   
+lockers = Map.fromList
           [(100,(Taken,"ZD39I"))
           ,(101,(Free,"JAH3I"))
           ,(103,(Free,"IQSA9"))
