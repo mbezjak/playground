@@ -11,7 +11,7 @@ toTry = do
   putStrLn $ "The file has " ++ (show . length . lines $ contents) ++ " lines!"
 
 handler :: IOError -> IO ()
-handler e 
+handler e
   | isDoesNotExistError e =
     case ioeGetFileName e of Just path -> putStrLn $ "File doesn't exist at: " ++ path
                              Nothing -> putStrLn "File doesn't exist at unknown location!"

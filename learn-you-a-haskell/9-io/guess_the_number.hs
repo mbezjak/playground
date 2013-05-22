@@ -4,7 +4,7 @@ import Control.Monad(when)
 main = do
   gen <- getStdGen
   askForNumber gen
-  
+
 askForNumber :: StdGen -> IO ()
 askForNumber gen = do
   let (randNumber, newGen) = randomR (1,10) gen :: (Int, StdGen)
