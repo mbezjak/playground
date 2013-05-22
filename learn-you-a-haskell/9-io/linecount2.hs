@@ -2,7 +2,7 @@ import System.Environment
 import System.IO
 import System.IO.Error
 
-main = toTry `catch` handler
+main = toTry `catchIOError` handler
 
 toTry :: IO ()
 toTry = do

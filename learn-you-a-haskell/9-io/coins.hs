@@ -14,7 +14,7 @@ threeCoins' gen = asTuple3 . take 3 $ randoms gen
 randoms' :: (RandomGen g, Random a) => g -> [a]
 randoms' gen = let (a, newGen) = random gen in a:randoms' newGen
 
-finiteRandoms :: (RandomGen g, Random a, Num n) => n -> g -> ([a], g)
+finiteRandoms :: (RandomGen g, Random a, Eq n, Num n) => n -> g -> ([a], g)
 finiteRandoms 0 g = ([], g)
 finiteRandoms n gen =
   let (value, newGen) = random gen
