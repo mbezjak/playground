@@ -2,15 +2,12 @@ data Tree a = Empty | Branch a (Tree a) (Tree a)
             deriving (Show, Eq)
 
 hbalTree :: Int -> [Tree Char]
-hbalTree 0 = []
+hbalTree 0 = [Empty]
 hbalTree 1 = [mkLeaf]
-hbalTree 2 = [mkNode mkLeaf mkLeaf, mkNode mkLeaf Empty, mkNode Empty mkLeaf]
-hbalTree n =
-  concat [combination x y | x <- hbalTree (next-rem), y <- hbalTree next]
-  where next = n - 1
-        rem  = next `mod` 2
-        combination x y =
-          if rem == 0 then [mkNode x y] else [mkNode x y, mkNode y x]
+hbalTree h = [mkNode l r |
+              (hl,hr) <- [(h-1,h-1), (h-2,h-1), (h-1,h-2)],
+              l <- hbalTree hl,
+              r <- hbalTree hr]
 
 mkLeaf :: Tree Char
 mkLeaf = Branch 'x' Empty Empty
