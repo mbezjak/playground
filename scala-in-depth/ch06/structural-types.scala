@@ -26,4 +26,5 @@ object Foo {
   def y: Y = "Hello world"
 }
 
-def nested(t: T): t.X = t.x
+def nestedX(t: T): T#X = t.x
+def nestedY(t: T): T#Y = t.y

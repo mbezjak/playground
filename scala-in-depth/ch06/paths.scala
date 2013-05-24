@@ -14,4 +14,6 @@ println(y.in)
 
 x.foo(x.in)
 //x.foo(y.in)
+
+x.bar(x.in)
 x.bar(y.in)
