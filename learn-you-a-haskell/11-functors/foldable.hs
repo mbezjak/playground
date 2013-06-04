@@ -21,10 +21,10 @@ class Foldable t where
 -}
 
 instance F.Foldable Tree where
-  foldMap f Empty = mempty
-  foldMap f(Node x l r) = F.foldMap f l `mappend`
-                          f x           `mappend`
-                          F.foldMap f r
+  foldMap f Empty        = mempty
+  foldMap f (Node x l r) = F.foldMap f l `mappend`
+                           f x           `mappend`
+                           F.foldMap f r
 
 testTree = Node 5
              (Node 3
