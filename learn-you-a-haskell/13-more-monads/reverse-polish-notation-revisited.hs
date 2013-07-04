@@ -16,6 +16,7 @@ foldingFunction xs numberString = read numberString:xs
 readMaybe :: (Read a) => String -> Maybe a
 readMaybe s = case reads s of [(x,"")] -> Just x
                               _        -> Nothing
+
 foldingFunction' :: [Double] -> String -> Maybe [Double]
 foldingFunction' (x:y:ys) "*" = return ((x * y):ys)
 foldingFunction' (x:y:ys) "+" = return ((x + y):ys)
