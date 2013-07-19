@@ -4,6 +4,7 @@ Completed programming exercises from:
  - [Programming in Haskell](http://www.cs.nott.ac.uk/~gmh/book.html)
  - [Scala by Example, draft May 24, 2011](http://www.scala-lang.org/docu/files/ScalaByExample.pdf)
  - [Scala in Depth](http://www.manning.com/suereth/)
+ - [Scala in Action](http://www.manning.com/raychaudhuri/)
  - [Twitter Scala School](http://twitter.github.com/scala_school)
  - [Practical Haskell: scripting with types](http://donsbot.wordpress.com/2010/08/17/practical-haskell)
  - [CSSBasics](http://www.cssbasics.com)
