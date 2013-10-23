@@ -9,3 +9,4 @@ Completed programming exercises from:
  - [Scala in Action](http://www.manning.com/raychaudhuri/)
  - [Twitter Scala School](http://twitter.github.com/scala_school)
  - [CSSBasics](http://www.cssbasics.com)
+ - [FPR in Javascript](http://flippinawesome.org/2013/09/30/functional-reactive-programming-in-javascript/)
