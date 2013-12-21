@@ -10,3 +10,4 @@ Completed programming exercises from:
  - [Twitter Scala School](http://twitter.github.com/scala_school)
  - [CSSBasics](http://www.cssbasics.com)
  - [FPR in Javascript](http://flippinawesome.org/2013/09/30/functional-reactive-programming-in-javascript/)
+ - [Clojure Protocols](http://debasishg.blogspot.com/2010/08/random-thoughts-on-clojure-protocols.html)
