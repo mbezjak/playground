@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>webfiles</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!-- https://developer.mozilla.org/en-US/docs/Using_files_from_web_applications -->
+    <script type="text/javascript">
+      function selected(files) {
+          var file   = files[0];
+          var button = document.getElementById("submit");
+
+
+          if (file.size < 100) {
+              button.disabled = true;
+              alert("File too small");
+          } else if (file.type != "application/zip" ) {
+              button.disabled = true;
+              alert("Only zips");
+          } else {
+              button.disabled = false;
+          }
+      }
+
+      function submit() {
+          var file = document.getElementById("input").files[0];
+          alert("fake submit: " + file.name);
+      }
+    </script>
+  </head>
+
+  <body>
+    <input type="file" id="input" onchange="selected(this.files);">
+    <br />
+    <button id="submit" onclick="submit();" disabled>submit</button>
+  </body>
+</html>
