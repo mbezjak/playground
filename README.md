@@ -11,3 +11,4 @@ Completed programming exercises from:
  - [CSSBasics](http://www.cssbasics.com)
  - [FPR in Javascript](http://flippinawesome.org/2013/09/30/functional-reactive-programming-in-javascript/)
  - [Clojure Protocols](http://debasishg.blogspot.com/2010/08/random-thoughts-on-clojure-protocols.html)
+ - [Lenses In Pictures](http://adit.io/posts/2013-07-22-lenses-in-pictures.html)
