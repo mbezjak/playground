@@ -11,14 +11,17 @@
 (defn run []
   (with-open [w (clojure.java.io/writer "file:///tmp/agent.txt" :append true)]
     (let [a (agent w)]
-      (pcalls (op a "abc") (op a "def") (op a "ghi") (op a "jkl"))
-      (op a "mno")
-      (op a "prs")
+      (dorun (pcalls (op a "abc") (op a "def") (op a "ghi") (op a "jkl")))
 
-      (Thread/sleep 1000)))
+      ((op a "mno"))
+      ((op a "pqr"))
+      ((op a "stu"))
 
-  ; not in clojure repl
-  ;(shutdown-agents)
+      ;; wait for agent to process everything
+      (Thread/sleep 500)))
+
+  ;; not in clojure repl
+  ;;(shutdown-agents)
 
   (println (slurp "/tmp/agent.txt"))
   (clojure.java.io/delete-file "/tmp/agent.txt"))
