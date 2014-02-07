@@ -28,7 +28,17 @@ test_fmapdefault = fmapDefault' (+1) [1, 2, 3]
 over' :: ((a -> Identity b) -> s -> Identity t) -> (a -> b) -> s -> t
 over' l f = runIdentity . l (Identity . f)
 
+
 type Setter s t a b = (a -> Identity b) -> s -> Identity t
 
 over :: Setter s t a b -> (a -> b) -> s -> t
 over l f = runIdentity . l (Identity . f)
+
+location :: Setter Mario Mario Point Point
+location f m = fmap Mario . f $ _location m
+
+x :: Setter Point Point Integer Integer
+x f p = fmap new . f $ _x p
+  where new x' = Point x' (_y p)
+
+useLens = print ((location.x) `over` (+10) $ player1)
