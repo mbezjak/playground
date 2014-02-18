@@ -26,3 +26,6 @@ val Rsun = 6.95508e8    // m
 val Lsun = 3.83e26      // W
 val bsun = 1370         // W m^-2 - solar constant
 val Tsun = 5777         // K
+val Rearth = 6.371e6    // m
+val Tearth = 288        // K
+val Learth = 4 * Pi * pow(Rearth, 2) * sigma * pow(Tearth, 4) // W
