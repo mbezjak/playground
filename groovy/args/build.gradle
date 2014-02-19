@@ -1,0 +1,22 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+version = '0.1'
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+mainClassName = 'app.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.2.1'
+    compile 'commons-cli:commons-cli:1.2'
+}
+
+run {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
