@@ -1,0 +1,17 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+version = '0.1'
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+mainClassName = 'groovy.util.JavadocAssertionTestSuite'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.2.1'
+    runtime 'junit:junit:4.11'
+    runtime 'org.apache.ant:ant:1.8.2'
+}
