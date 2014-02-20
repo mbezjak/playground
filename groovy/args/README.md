@@ -1,0 +1,5 @@
+Refs:
+
+ * http://groovy.codehaus.org/gapi/groovy/util/CliBuilder.html
+ * http://gradle.1045684.n5.nabble.com/Command-line-arguments-to-application-td3999977.html
+ * http://stackoverflow.com/questions/12283463/in-bash-how-do-i-join-n-parameters-together-as-a-string
