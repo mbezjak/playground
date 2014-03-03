@@ -23,7 +23,7 @@ class Main {
 
     static Date getEndOfTheYear() {
         def zeroBased = 1
-        new Date().updated(
+        new Date().copyWith(
             month      : 12 - zeroBased,
             dayOfMonth : 31
         ).clearTime()
