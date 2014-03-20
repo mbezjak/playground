@@ -1,0 +1,25 @@
+version = '0.1'
+
+allprojects {
+    apply plugin: 'groovy'
+
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile 'org.codehaus.groovy:groovy-all:2.2.2'
+    }
+}
+
+project(':main') {
+    apply plugin: 'application'
+    mainClassName = 'app.Main'
+
+    dependencies {
+        compile project(':transformation')
+    }
+}
