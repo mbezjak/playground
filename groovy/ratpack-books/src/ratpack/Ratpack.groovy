@@ -1,16 +1,39 @@
 import static ratpack.groovy.Groovy.groovyTemplate
 import static ratpack.groovy.Groovy.ratpack
+import ratpack.form.Form
 
-import book.PingHandler
+import book.BooksModule
+import book.Repository
 
 ratpack {
-    handlers {
-        get('ping', new PingHandler())
+    modules {
+        register new BooksModule()
+    }
 
-        get {
-            render groovyTemplate("index.html", title: "My Ratpack App")
+    handlers {
+        get('ping') { render([pong: true]) }
+
+        get('book/names') { Repository repository ->
+            def names = repository.names()
+
+            render([names: names])
         }
 
-        assets "public"
+        get('book/:name') { Repository repository ->
+            def name = pathTokens.name
+            def book = repository[name] ?: [:]
+
+            render book
+        }
+
+        post('book') { Repository repository ->
+            def book = parse(Form)
+            def name = book.name ?: 'unnamed'
+            repository.put(name, book)
+
+            def created = 201
+            response.status(created)
+            response.send ''
+        }
     }
 }
