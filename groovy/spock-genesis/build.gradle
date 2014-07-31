@@ -1,0 +1,21 @@
+apply plugin: 'groovy'
+
+version = '0.1'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile 'com.nagternal:spock-genesis:0.1.0'
+}
+
+// https://jira.codehaus.org/browse/GROOVY-6951
+// https://bugs.openjdk.java.net/browse/JDK-8051012
+// http://stackoverflow.com/questions/21906736/how-do-i-set-jvm-options-for-gradleworkermain
+tasks.withType(JavaForkOptions) {
+    jvmArgs "-noverify"
+}
