@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <textarea id="txt" rows=5 cols=70>What you write here can be easily exported as a file.</textarea>
+    <div>
+      <a id="link" href="" download="something.txt">Just click here</a>
+    </div>
+
+    <script>
+      var txt = document.getElementById("txt");
+      var link = document.getElementById("link");
+      link.onclick = function() {
+          this.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt.value);
+      };
+    </script>
+  </body>
+</html>
