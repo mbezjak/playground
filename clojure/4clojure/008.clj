@@ -1,3 +1,5 @@
+(require '[clojure.set])
+
 (def x #{:a :b :c :d})
 
 (assert (= x (set '(:a :a :b :c :c :c :c :d :d))))

@@ -1,3 +1,5 @@
+(require '[clojure.set])
+
 (defn f [xs ys]
   (clojure.set/union (clojure.set/difference xs ys) (clojure.set/difference ys xs)))
 

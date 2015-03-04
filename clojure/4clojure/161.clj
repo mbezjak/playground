@@ -1,3 +1,5 @@
+(require '[clojure.set])
+
 (def x #{1 2})
 
 (assert (clojure.set/superset? x #{2}))
