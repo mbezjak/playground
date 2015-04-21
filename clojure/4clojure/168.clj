@@ -2,15 +2,29 @@
 
 (defn as-matrix
   ([f]
+   (as-matrix f 0 0))
+
+  ([f m n]
+   (let [list-from (fn list-from [x]
+                     (cons x (lazy-seq (list-from (inc x)))))
+         rs (list-from m)
+         cs (list-from n)]
+     (map (fn [i] (map (fn [j] (f i j)) cs)) rs)))
+
+  ([f m n s t]
+   (take s (map #(take t %) (as-matrix f m n)))))
+
+(defn as-matrix2
+  ([f]
    (for [i (range)]
      (for [j (range)]
        (f i j))))
 
   ([f m n]
-   (drop m (map #(drop n %) (as-matrix f))))
+   (drop m (map #(drop n %) (as-matrix2 f))))
 
   ([f m n s t]
-   (take s (map #(take t %) (as-matrix f m n)))))
+   (take s (map #(take t %) (as-matrix2 f m n)))))
 
 
 (is (= (take 5 (map #(take 6 %) (as-matrix str)))
