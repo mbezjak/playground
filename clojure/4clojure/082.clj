@@ -13,8 +13,8 @@
               (cond
                 (= c1 c2) (word-diff-same-len w1 w2)
                 (= c1 (inc c2)) (some true? (for [i (range c1)
-                                                  :let [left (.substring w1 0 i)
-                                                        right (.substring w1 (inc i) c1)
+                                                  :let [left (subs w1 0 i)
+                                                        right (subs w1 (inc i) c1)
                                                         new-word (str left right)]]
                                               (word-diff-same-len new-word w2)))
                 (= c1 (dec c2)) (word-diff w2 w1)
