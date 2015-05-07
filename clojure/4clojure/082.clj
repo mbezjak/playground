@@ -27,7 +27,7 @@
               [[leader]]
               (let [nexts (filter #(word-diff leader %) xs)]
                 (if (empty? nexts)
-                  [["xxx"]]
+                  []
                   (for [next nexts
                         :let [rst (disj xs next)]
                         p (permutations next rst)]
@@ -36,7 +36,8 @@
             (for [i (range (count xs))
                   :let [x (nth (vec xs) i)
                         rst (disj xs x)]
-                  p (permutations x rst)]
+                  p (permutations x rst)
+                  :when (= (count xs) (count p))]
               p))]
 
     (or (some is-chain (permutations-start words)) false)))
