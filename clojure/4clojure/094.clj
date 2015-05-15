@@ -94,6 +94,46 @@
              (fn [cell row col]
                (format-cell (cell-next-generation board cell row col)))))
 
+(defn next-generation2 [board]
+  (letfn [(map-board [f]
+            (vec (map-indexed (fn [ridx row]
+                                (apply str (map-indexed (fn [cidx cell]
+                                                          (f cell ridx cidx))
+                                                        row)))
+                              board)))
+          (format-cell [kw]
+            (if (= :alive kw) "#" " "))
+          (alive? [cell]
+            (= cell \#))
+          (neighbors-of [row col]
+            (set (for [nbor-row (range (dec row) (+ 2 row))
+                       nbor-col (range (dec col) (+ 2 col))
+                       :when (not (and (= nbor-row row) (= nbor-col col)))]
+                   [nbor-row nbor-col])))
+          (in-board? [dim [row col]]
+            (and
+             (>= row 0)
+             (>= col 0)
+             (< row dim)
+             (< col dim)))
+          (valid-neighbors-of [dim row col]
+            (set (filter (partial in-board? dim) (neighbors-of row col))))
+          (count-alive-neighbors-of [row col]
+            (count (filter alive? (for [[nbor-row nbor-col] (valid-neighbors-of (count board) row col)]
+                                    (get-in board [nbor-row nbor-col])))))
+          (cell-next-generation [cell row col]
+            (let [alive-cell (alive? cell)
+                  alive-nbor-count (count-alive-neighbors-of row col)]
+              (cond
+                (and alive-cell (< alive-nbor-count 2)) :dead
+                (and alive-cell (contains? #{2 3} alive-nbor-count)) :alive
+                (and alive-cell (> alive-nbor-count 3)) :dead
+                (and (not alive-cell) (= 3 alive-nbor-count)) :alive
+                :else :dead)))]
+    (map-board
+     (fn [cell row col]
+       (format-cell (cell-next-generation cell row col))))))
+
 
 (is (= (next-generation ["      "
                          " ##   "
