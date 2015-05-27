@@ -22,38 +22,31 @@
 (is (= (remove-visited-node :a {:a [:a :b] :b [:a] :c [:b]})
        {:c [:b]}))
 
-(defn consume [must-visit-nodes remaining-nodes graph-hash]
-  (cond
-    (and (empty? must-visit-nodes) (empty? remaining-nodes) (empty? graph-hash)) true
-    (empty? must-visit-nodes) false
-    :else
-    (let [node (first must-visit-nodes)
-          links (get graph-hash node)
-          new-must-visit-nodes (set (concat (disj must-visit-nodes node) links))
-          new-remaining-nodes (disj remaining-nodes node)
+(defn consume [node remaining-nodes graph-hash]
+  (if (empty? remaining-nodes)
+    true
+    (let [links (get graph-hash node)
           new-graph-hash (remove-visited-node node graph-hash)]
-      (consume new-must-visit-nodes new-remaining-nodes new-graph-hash))))
+      (if (and (nil? links) (not (empty? remaining-nodes)))
+        false
+        (not-every? false? (map (fn [link]
+                                  (consume link (disj remaining-nodes link) new-graph-hash))
+                                links))))))
 
-(is (= (consume #{:a} #{:a :b :c} {:a [:b], :b [:c]})
-       true))
-
-(is (= (consume #{:a} #{:a :b :c} {:a [:b], :b [:a]})
-       false))
-
-(is (= (consume #{:a} #{:a :b} {:a [:a], :b [:b]})
-       false))
-
-(is (= (consume #{1} #{1 2 3 4} {1 [2], 2 [3], 3 [4], 4 [1]})
-       true))
-
-(is (= (consume #{1} #{1 2 3 4 5} {1 [2], 2 [3 4 5]})
-       false))
+(is (= true  (consume :a #{:b :c}  {:a [:b], :b [:c]})))
+(is (= false (consume :a #{:b :c}  {:a [:b], :b [:a]})))
+(is (= false (consume :a #{:b}     {:a [:a], :b [:b]})))
+(is (= true  (consume 1  #{2 3 4}   {1 [2], 2 [3], 3 [4], 4 [1]})))
+(is (= false (consume 1  #{2 3 4 5} {1 [2], 2 [3 4 5]})))
+(is (= false (consume :a  #{:b :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= false (consume :b  #{:a :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= false (consume :c  #{:a :b :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
 
 (defn tour? [graph]
   (let [all-nodes (all-nodes-in graph)
         graph-hash (graph-to-map graph)]
     (not-every? false? (for [starting-node all-nodes]
-                         (consume #{starting-node} all-nodes graph-hash)))))
+                         (consume starting-node (disj all-nodes starting-node) graph-hash)))))
 
 (is (= true (tour? [[:a :b]])))
 
