@@ -22,6 +22,24 @@
 (is (= (remove-visited-node :a {:a [:a :b] :b [:a] :c [:b]})
        {:c [:b]}))
 
+(defn remove-visited-edge [[from to] graph-hash]
+  (let [rm-link (fn [key val map]
+                  (let [links (get map key)]
+                    (if links
+                      (assoc map key (remove #{val} links))
+                      map)))]
+    (->> graph-hash
+         (rm-link from to)
+         (rm-link to from)
+         (filter (fn [[key links]] (not (empty? links))))
+         (into {}))))
+
+(is (= (remove-visited-edge [:a :a] {:a [:a :b] :b [:a] :c [:b]})
+       {:a [:b] :b [:a] :c [:b]}))
+
+(is (= (remove-visited-edge [:a :b] {:a [:a :b] :b [:a] :c [:b]})
+       {:a [:a] :c [:b]}))
+
 (defn consume [node remaining-nodes graph-hash]
   (if (empty? remaining-nodes)
     true
@@ -38,9 +56,9 @@
 (is (= false (consume :a #{:b}     {:a [:a], :b [:b]})))
 (is (= true  (consume 1  #{2 3 4}   {1 [2], 2 [3], 3 [4], 4 [1]})))
 (is (= false (consume 1  #{2 3 4 5} {1 [2], 2 [3 4 5]})))
-(is (= false (consume :a  #{:b :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
-(is (= false (consume :b  #{:a :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
-(is (= false (consume :c  #{:a :b :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= false (consume :a #{:b :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= false (consume :b #{:a :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= false (consume :c #{:a :b :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
 
 (defn tour? [graph]
   (let [all-nodes (all-nodes-in graph)
