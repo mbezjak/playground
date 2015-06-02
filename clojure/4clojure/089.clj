@@ -40,31 +40,36 @@
 (is (= (remove-visited-edge [:a :b] {:a [:a :b] :b [:a] :c [:b]})
        {:a [:a] :c [:b]}))
 
-(defn consume [node remaining-nodes graph-hash]
-  (if (empty? remaining-nodes)
-    true
-    (let [links (get graph-hash node)
-          new-graph-hash (remove-visited-node node graph-hash)]
-      (if (and (nil? links) (not (empty? remaining-nodes)))
-        false
-        (not-every? false? (map (fn [link]
-                                  (consume link (disj remaining-nodes link) new-graph-hash))
-                                links))))))
+(defn find-next-edges [graph node]
+  (set (concat
+        (filter #(= node (first %)) graph)
+        (filter #(= node (first %)) (map reverse graph)))))
 
-(is (= true  (consume :a #{:b :c}  {:a [:b], :b [:c]})))
-(is (= false (consume :a #{:b :c}  {:a [:b], :b [:a]})))
-(is (= false (consume :a #{:b}     {:a [:a], :b [:b]})))
-(is (= true  (consume 1  #{2 3 4}   {1 [2], 2 [3], 3 [4], 4 [1]})))
-(is (= false (consume 1  #{2 3 4 5} {1 [2], 2 [3 4 5]})))
-(is (= false (consume :a #{:b :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
-(is (= false (consume :b #{:a :c :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
-(is (= false (consume :c #{:a :b :d} {:a [:b :b :c :d], :b [:d], :c [:a :d]})))
+(is (= #{[:a :b]} (find-next-edges [[:a :b] [:b :c]] :a)))
+(is (= #{[:a :b] [:a :c] (find-next-edges [[:a :b] [:b :c] [:a :c]] :a)}))
+(is (= #{[:b :a] [:b :c] (find-next-edges [[:a :b] [:b :c] [:a :c]] :b)}))
+
+(defn consume [[from to :as edge] remaining]
+  (if (empty? remaining)
+    true
+    (let [next-edges (find-next-edges remaining to)]
+      (if (empty? next-edges)
+        false
+        (not-every? false? (map (fn [next-edge]
+                                  (consume next-edge (remove #{next-edge} remaining)))
+                                next-edges))))))
+
+(is (= true  (consume [:a :b] [])))
+(is (= false (consume [:a :b] [[:c :d]])))
+(is (= true  (consume [:a :b] [[:b :c]])))
+(is (= false (consume [:a :b] [[:b :c] [:b :d]])))
+(is (= true  (consume [:a :b] [[:b :c] [:c :d] [:b :d]])))
 
 (defn tour? [graph]
-  (let [all-nodes (all-nodes-in graph)
-        graph-hash (graph-to-map graph)]
-    (not-every? false? (for [starting-node all-nodes]
-                         (consume starting-node (disj all-nodes starting-node) graph-hash)))))
+  (if-not (apply distinct? graph)
+    false
+    (not-every? false? (for [starting-edge graph]
+                         (consume starting-edge (remove #{starting-edge} graph))))))
 
 (is (= true (tour? [[:a :b]])))
 
