@@ -165,4 +165,21 @@ Ext.onReady(function() {
             removeButton.enable();
         }
     });
+
+    var infoButton = Ext.create('Ext.Button', {
+        text: 'Info',
+        disabled: true,
+        renderTo: document.body,
+        handler: function() {
+            var record = grid.getSelectionModel().getSelection()[0];
+            Ext.Msg.alert('Info', 'Price: ' + record.get('price'));
+        }
+    });
+
+    var eventStream = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', function(ignored, records) {
+        return records[0];
+    });
+    eventStream.not().not().onValue(function(selected) {
+        infoButton.setDisabled(!selected);
+    });
 });
