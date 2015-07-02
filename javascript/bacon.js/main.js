@@ -176,10 +176,19 @@ Ext.onReady(function() {
         }
     });
 
+    var enableDisableInfoButton = function(enable) {
+        infoButton.setDisabled(!enable);
+    };
+
     var eventStream = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', function(ignored, records) {
         return records[0];
     });
-    eventStream.not().not().onValue(function(selected) {
-        infoButton.setDisabled(!selected);
+    var hasSelection = eventStream.not().not();
+    var onSelected = eventStream.filter(Ext.identityFn);
+    var moreThan40 = onSelected.map(function(record) { return record.get('price') > 40; });
+    var notSelectedOrMoreThan40 = hasSelection.combine(moreThan40, function(hasSelection, gt40) {
+        return hasSelection ? gt40 : false;
     });
+
+    notSelectedOrMoreThan40.onValue(enableDisableInfoButton);
 });
