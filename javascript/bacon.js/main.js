@@ -166,6 +166,14 @@ Ext.onReady(function() {
         }
     });
 
+    Ext.create('Ext.Button', {
+        text: 'Change 3m Co',
+        renderTo: document.body,
+        handler: function() {
+            store.getAt(0).set('price', 20.01);
+        }
+    });
+
     var infoButton = Ext.create('Ext.Button', {
         text: 'Info',
         disabled: true,
@@ -180,12 +188,21 @@ Ext.onReady(function() {
         infoButton.setDisabled(!enable);
     };
 
-    var eventStream = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', function(ignored, records) {
+    var updated = Bacon.fromEvent(store, 'update', function(ignored, record) {
+        return record;
+    });
+    var selectedRecordUpdated = updated.filter(function(record) {
+        throw new Error('bal');
+        return record == grid.getSelectionModel().getSelection()[0];
+    });
+
+    var selectionChange = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', function(ignored, records) {
         return records[0];
     });
-    var hasSelection = eventStream.not().not();
-    var onSelected = eventStream.filter(Ext.identityFn);
-    var moreThan40 = onSelected.map(function(record) { return record.get('price') > 40; });
+
+    var hasSelection = selectionChange.not().not();
+    var onSelected = selectionChange.filter(Ext.identityFn);
+    var moreThan40 = onSelected.merge(selectedRecordUpdated).map(function(record) { return record.get('price') > 40; });
     var notSelectedOrMoreThan40 = hasSelection.combine(moreThan40, function(hasSelection, gt40) {
         return hasSelection ? gt40 : false;
     });
