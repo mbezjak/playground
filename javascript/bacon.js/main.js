@@ -76,6 +76,9 @@ Ext.onReady(function() {
         store: store,
         stateful: true,
         stateId: 'stateGrid',
+        selModel : {
+            mode : 'MULTI'
+        },
         columns: [
             {
                 text     : 'Company',
