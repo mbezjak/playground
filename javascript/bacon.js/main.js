@@ -189,34 +189,33 @@ Ext.onReady(function() {
         infoButton.setDisabled(!enable);
     };
 
-    var updated = Bacon.fromEvent(store, 'update', function(ignored, record) {
-        return record;
-    });
-    var selectedRecordUpdated = updated.filter(function(record) {
-        return record === grid.getSelectionModel().getSelection()[0];
-    });
+    // fn utils
+    var secondArg  = function(fst, snd) { return snd; };
+    var arrayFirst = function(array) { return array[0]; };
+    var truthy     = function(val) { return !!val; };
+    var ifEqualRet = function(a, b) { return a === b ? a : false; };
+    var isArrayOfOneElement = function(array)  { return array.length === 1; };
+    var isPriceGt40         = function(record) { return record.get('price') > 40; };
+    var getPermission       = function(record) { return record.get('permission'); };
+    var permissionsMatch    = function(user, row) { return user === row; };
 
-    var selectionChange = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', function(ignored, records) {
-        return records[0];
-    });
+    // stream construction
+    var permissionUserHas  = 'user';
+    var updateStream       = Bacon.fromEvent(store, 'update', secondArg);
+    var multiSelectStream  = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', secondArg);
+    var permissionProperty = Bacon.constant(permissionUserHas);
 
-    var hasSelection = selectionChange.not().not();
-    var onSelected = selectionChange.filter(Ext.identityFn);
-    var moreThan40 = onSelected.merge(selectedRecordUpdated).map(function(record) { return record.get('price') > 40; });
+    // stream usage
+    var oneRowSelected       = multiSelectStream.map(isArrayOfOneElement);
+    var singleSelection      = multiSelectStream.filter(isArrayOfOneElement).map(arrayFirst);
+    var updatedSelected      = updateStream.combine(singleSelection, ifEqualRet).filter(truthy);
+    var gt40                 = singleSelection.merge(updatedSelected).map(isPriceGt40);
+    var permissionOfSelected = singleSelection.map(getPermission);
+    var hasValidPermission   = permissionProperty.sampledBy(permissionOfSelected, permissionsMatch);
 
-    var permissionUserHas = 'user';
-    var recordPermission = selectionChange.filter(Ext.identityFn).map(function(record) {
-        return record.get('permission');
-    });
-    var permissionStream = Bacon.constant(permissionUserHas).sampledBy(recordPermission, function(userPermission, rowPermission) {
-        return userPermission === rowPermission;
-    });
+    var enableDisableStream  = Bacon.combineWith(function(somethingSelected, isValidPermission, isGt40) {
+        return somethingSelected && isValidPermission && isGt40;
+    }, oneRowSelected, hasValidPermission, gt40);
 
-    var hasPermissionAndSelectedAndMoreThan40 = hasSelection.combine(moreThan40, function(hasSelection, gt40) {
-        return hasSelection ? gt40 : false;
-    }).combine(permissionStream, function(selectedAndgt40, validPermission) {
-        return validPermission ? selectedAndgt40 : false;
-    });
-
-    hasPermissionAndSelectedAndMoreThan40.onValue(enableDisableInfoButton);
+    enableDisableStream.onValue(enableDisableInfoButton);
 });
