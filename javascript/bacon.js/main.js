@@ -91,25 +91,23 @@ Ext.onReady(function() {
         }
     });
 
-    var removeButton = Ext.create('Ext.Button', {
+    var removeAllButton = Ext.create('Ext.Button', {
         text: "Remove all",
         renderTo: document.body,
         handler: function() {
             store.removeAll();
-            addButton.enable();
         }
     });
-    var addButton = Ext.create('Ext.Button', {
+    var addBackButton = Ext.create('Ext.Button', {
         text: 'Add back',
         disabled: true,
         renderTo: document.body,
         handler: function() {
             store.add(sampleData);
-            removeButton.enable();
         }
     });
 
-    Ext.create('Ext.Button', {
+    var change3mCoButton = Ext.create('Ext.Button', {
         text: 'Change 3m Co',
         renderTo: document.body,
         handler: function() {
@@ -127,11 +125,8 @@ Ext.onReady(function() {
         }
     });
 
-    var enableDisableInfoButton = function(enable) {
-        infoButton.setDisabled(!enable);
-    };
-
     // fn utils
+    var constant   = function(val) { return function() { return val; }; };
     var secondArg  = function(fst, snd) { return snd; };
     var arrayFirst = function(array) { return array[0]; };
     var truthy     = function(val) { return !!val; };
@@ -140,12 +135,19 @@ Ext.onReady(function() {
     var isPriceGt40         = function(record) { return record.get('price') > 40; };
     var getPermission       = function(record) { return record.get('permission'); };
     var permissionsMatch    = function(user, row) { return user === row; };
+    var storeHasRecords     = function(store) { return store.getCount() !== 0; };
+    var enableDisableButton = function(button) {
+        return function(enable) {
+            button.setDisabled(!enable);
+        };
+    };
 
     // stream construction
     var permissionUserHas  = 'user';
     var updateStream       = Bacon.fromEvent(store, 'update', secondArg);
     var multiSelectStream  = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', secondArg);
     var permissionProperty = Bacon.constant(permissionUserHas);
+    var dataChangedStream  = Bacon.fromEvent(store, 'datachanged', constant(store));
 
     // stream usage
     var oneRowSelected       = multiSelectStream.map(isArrayOfOneElement);
@@ -154,10 +156,14 @@ Ext.onReady(function() {
     var gt40                 = singleSelection.merge(updatedSelected).map(isPriceGt40);
     var permissionOfSelected = singleSelection.map(getPermission);
     var hasValidPermission   = permissionProperty.sampledBy(permissionOfSelected, permissionsMatch);
+    var storeHasSomething    = dataChangedStream.map(storeHasRecords);
 
     var enableDisableStream  = Bacon.combineWith(function(somethingSelected, isValidPermission, isGt40) {
         return somethingSelected && isValidPermission && isGt40;
     }, oneRowSelected, hasValidPermission, gt40);
 
-    enableDisableStream.onValue(enableDisableInfoButton);
+    enableDisableStream.onValue(enableDisableButton(infoButton));
+    storeHasSomething.onValue(enableDisableButton(change3mCoButton));
+    storeHasSomething.onValue(enableDisableButton(removeAllButton));
+    storeHasSomething.not().onValue(enableDisableButton(addBackButton));
 });
