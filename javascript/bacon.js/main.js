@@ -1,6 +1,5 @@
 Ext.onReady(function() {
     Ext.QuickTips.init();
-    Ext.state.Manager.setProvider(Ext.create('Ext.state.Provider'));
 
     var sampleData = [
         ['3m Co',                               71.72,  0.02, 'user'],
@@ -46,8 +45,8 @@ Ext.onReady(function() {
     var store = Ext.create('Ext.data.ArrayStore', {
         fields: [
             {name: 'company'},
-            {name: 'price',     type: 'float'},
-            {name: 'change',    type: 'float'},
+            {name: 'price',  type: 'float'},
+            {name: 'change', type: 'float'},
             {name: 'permission'}
         ],
         data: sampleData
@@ -55,8 +54,6 @@ Ext.onReady(function() {
 
     var grid = Ext.create('Ext.grid.Panel', {
         store: store,
-        stateful: true,
-        stateId: 'stateGrid',
         columns: [
             {
                 text     : 'Company',
