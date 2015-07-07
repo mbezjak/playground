@@ -119,7 +119,7 @@ Ext.onReady(function() {
     var multiSelectStream  = Bacon.fromEvent(grid.getSelectionModel(), 'selectionchange', secondArg);
     var permissionProperty = Bacon.constant(permissionUserHas);
     var dataChangedStream  = Bacon.fromEvent(store, 'datachanged', constant(store));
-    var keyDownStream      = Bacon.fromEvent(grid.getEl(), 'keypress');
+    var keyPressStream     = Bacon.fromEvent(grid.getEl(), 'keypress');
     var removeAllClicks    = streamFromClick(removeAllButton);
     var addBackClicks      = streamFromClick(addBackButton);
     var change3mCoClicks   = streamFromClick(change3mCoButton);
@@ -133,8 +133,8 @@ Ext.onReady(function() {
     var permissionOfSelected = singleSelection.map(getPermission);
     var hasValidPermission   = permissionProperty.sampledBy(permissionOfSelected, permissionsMatch);
     var storeHasSomething    = dataChangedStream.map(storeHasRecords);
-    var deleteKey            = keyDownStream.filter(isKey(Ext.EventObject.DELETE));
-    var enterKey             = keyDownStream.filter(isKey(Ext.EventObject.ENTER));
+    var deleteKey            = keyPressStream.filter(isKey(Ext.EventObject.DELETE));
+    var enterKey             = keyPressStream.filter(isKey(Ext.EventObject.ENTER));
     var removeAllEvents      = deleteKey.merge(removeAllClicks).map(store).filter(storeHasRecords);
     var addBackEvents        = enterKey.merge(addBackClicks).map(store).filter(not(storeHasRecords));
 
