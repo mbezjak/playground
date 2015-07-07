@@ -2,90 +2,62 @@ Ext.onReady(function() {
     Ext.QuickTips.init();
 
     var sampleData = [
-        ['3m Co',                               71.72,  0.02, 'user'],
-        ['Alcoa Inc',                           29.01,  0.42, 'user'],
-        ['Altria Group Inc',                    83.81,  0.28, 'user'],
-        ['American Express Company',            52.55,  0.01, 'user'],
-        ['American International Group, Inc.',  64.13,  0.31, 'user'],
-        ['AT&T Inc.',                           31.61, -0.48, 'user'],
-        ['Boeing Co.',                          75.43,  0.53, 'user'],
-        ['Caterpillar Inc.',                    67.27,  0.92, 'admin'],
-        ['Citigroup, Inc.',                     49.37,  0.02, 'admin'],
-        ['E.I. du Pont de Nemours and Company', 40.48,  0.51, 'admin'],
-        ['Exxon Mobil Corp',                    68.10, -0.43, 'admin'],
-        ['General Electric Company',            34.14, -0.08, 'admin'],
-        ['General Motors Corporation',          30.27,  1.09, 'admin'],
-        ['Hewlett-Packard Co.',                 36.53, -0.03, 'admin'],
-        ['Honeywell Intl Inc',                  38.77,  0.05, 'admin'],
-        ['Intel Corporation',                   19.88,  0.31, 'admin'],
-        ['International Business Machines',     81.41,  0.44, 'admin'],
-        ['Johnson & Johnson',                   64.72,  0.06, 'admin'],
-        ['JP Morgan & Chase & Co',              45.73,  0.07, 'admin'],
-        ['McDonald\'s Corporation',             36.76,  0.86, 'admin'],
-        ['Merck & Co., Inc.',                   40.96,  0.41, 'admin'],
-        ['Microsoft Corporation',               25.84,  0.14, 'admin'],
-        ['Pfizer Inc',                          27.96,  0.40, 'admin'],
-        ['The Coca-Cola Company',               45.07,  0.26, 'admin'],
-        ['The Home Depot, Inc.',                34.64,  0.35, 'admin'],
-        ['The Procter & Gamble Company',        61.91,  0.01, 'admin'],
-        ['United Technologies Corporation',     63.26,  0.55, 'admin'],
-        ['Verizon Communications',              35.57,  0.39, 'admin'],
-        ['Wal-Mart Stores, Inc.',               45.45,  0.73, 'admin']
+        ['3m Co',                               71.72, 'user'],
+        ['Alcoa Inc',                           29.01, 'user'],
+        ['Altria Group Inc',                    83.81, 'user'],
+        ['American Express Company',            52.55, 'user'],
+        ['American International Group, Inc.',  64.13, 'user'],
+        ['AT&T Inc.',                           31.61, 'user'],
+        ['Boeing Co.',                          75.43, 'user'],
+        ['Caterpillar Inc.',                    67.27, 'admin'],
+        ['Citigroup, Inc.',                     49.37, 'admin'],
+        ['E.I. du Pont de Nemours and Company', 40.48, 'admin'],
+        ['Exxon Mobil Corp',                    68.10, 'admin'],
+        ['General Electric Company',            34.14, 'admin'],
+        ['General Motors Corporation',          30.27, 'admin'],
+        ['Hewlett-Packard Co.',                 36.53, 'admin'],
+        ['Honeywell Intl Inc',                  38.77, 'admin'],
+        ['Intel Corporation',                   19.88, 'admin'],
+        ['International Business Machines',     81.41, 'admin'],
+        ['Johnson & Johnson',                   64.72, 'admin'],
+        ['JP Morgan & Chase & Co',              45.73, 'admin'],
+        ['McDonald\'s Corporation',             36.76, 'admin'],
+        ['Merck & Co., Inc.',                   40.96, 'admin'],
+        ['Microsoft Corporation',               25.84, 'admin'],
+        ['Pfizer Inc',                          27.96, 'admin'],
+        ['The Coca-Cola Company',               45.07, 'admin'],
+        ['The Home Depot, Inc.',                34.64, 'admin'],
+        ['The Procter & Gamble Company',        61.91, 'admin'],
+        ['United Technologies Corporation',     63.26, 'admin'],
+        ['Verizon Communications',              35.57, 'admin'],
+        ['Wal-Mart Stores, Inc.',               45.45, 'admin']
     ];
 
-    function change(val) {
-        if (val > 0) {
-            return '<span style="color:green;">' + val + '</span>';
-        } else if (val < 0) {
-            return '<span style="color:red;">' + val + '</span>';
-        }
-        return val;
-    }
-
     var store = Ext.create('Ext.data.ArrayStore', {
-        fields: [
-            {name: 'company'},
-            {name: 'price',  type: 'float'},
-            {name: 'change', type: 'float'},
-            {name: 'permission'}
-        ],
-        data: sampleData
+        fields : ['company', { name: 'price', type: 'float' }, 'permission'],
+        data   : sampleData
     });
 
     var grid = Ext.create('Ext.grid.Panel', {
-        store: store,
-        columns: [
-            {
-                text     : 'Company',
-                flex     : 1,
-                sortable : false,
-                dataIndex: 'company'
-            },
-            {
-                text     : 'Price',
-                width    : 75,
-                sortable : true,
-                renderer : 'usMoney',
-                dataIndex: 'price'
-            },
-            {
-                text     : 'Change',
-                width    : 75,
-                sortable : true,
-                renderer : change,
-                dataIndex: 'change'
-            }
-        ],
-        height: 500,
-        width: 500,
-        title: 'Grid',
-        renderTo: document.body,
-        selModel: {
-            mode: 'MULTI'
-        },
-        viewConfig: {
-            stripeRows: true
-        }
+        height     : 500,
+        width      : 400,
+        renderTo   : document.body,
+        title      : 'Grid',
+        selModel   : { mode : 'MULTI' },
+        viewConfig : { stripeRows : true },
+        store      : store,
+        columns    : [{
+            text      : 'Company',
+            flex      : 1,
+            sortable  : true,
+            dataIndex : 'company'
+        }, {
+            text      : 'Price',
+            width     : 75,
+            sortable  : true,
+            renderer  : 'usMoney',
+            dataIndex : 'price'
+        }]
     });
 
     var removeAllButton = Ext.create('Ext.Button', {
