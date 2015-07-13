@@ -8,9 +8,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.6'
-    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile 'com.nagternal:spock-genesis:0.1.0'
+    compile 'org.codehaus.groovy:groovy-all:2.4.3'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'com.nagternal:spock-genesis:0.3.0'
 }
 
 // https://jira.codehaus.org/browse/GROOVY-6951
