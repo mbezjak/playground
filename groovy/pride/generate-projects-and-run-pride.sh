@@ -50,7 +50,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.prezi.pride:gradle-pride-plugin:0.10"
+        classpath "com.prezi.pride:gradle-pride-plugin:0.11-rc-1"
     }
 }
 
@@ -84,7 +84,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.prezi.pride:gradle-pride-plugin:0.10"
+        classpath "com.prezi.pride:gradle-pride-plugin:0.11-rc-1"
     }
 }
 
@@ -102,11 +102,8 @@ repositories {
     mavenCentral()
 }
 
-dynamicDependencies {
-    compile 'com.example:lib:0.1'
-}
-
 dependencies {
+    compile 'com.example:lib:0.1'
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
