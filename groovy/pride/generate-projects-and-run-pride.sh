@@ -152,10 +152,10 @@ mkdir -p $pridedir
 cd $pridedir
 pride init &> /dev/null
 pride add --repo-base-url $projectsdir app lib &> /dev/null
-gradle check
+./gradlew check
 
 
 sed -i 's|42|11|' $pridedir/lib/$maindir/Library.groovy
-gradle check
+./gradlew check
 
 exit 0
