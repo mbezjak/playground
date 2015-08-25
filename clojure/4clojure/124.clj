@@ -32,7 +32,69 @@
 (is (= '[w b e] (truncate '[w b e e])))
 (is (= '[w b e] (truncate '[w b e])))
 
-ee
+(defn color-positions [color board]
+  (set
+   (for [[ridx row] (map-indexed vector board)
+         [cidx cell] (map-indexed vector row)
+         :when (= cell color)]
+     [ridx cidx])))
+
+(is (= #{[1 1] [2 2]}
+       (color-positions 'w '[[e e e e]
+                             [e w b e]
+                             [e b w e]
+                             [e e e e]])))
+
+(defn in-bounds? [[ridx cidx]]
+  (and (>= ridx 0)
+       (>= cidx 0)
+       (< ridx 4)
+       (< cidx 4)))
+
+(defn diagonal-down-move [start-pos board]
+  (let [up-left-pos (last (take-while in-bounds? (iterate #(mapv dec %) start-pos)))]
+    (vec (for [i (range 4)
+               :let [pos (mapv #(+ % i) up-left-pos)]
+               :when (in-bounds? pos)]
+           (get-in board pos)))))
+
+(is (= '[e w e]
+       (diagonal-down-move [2 1] '[[e e e e]
+                                   [e e b e]
+                                   [e w w e]
+                                   [e e e e]])))
+
+(defn diagonal-up-move [start-pos board]
+  (let [[down-row down-col] (last (take-while in-bounds? (iterate (fn [[r c]] [(inc r) (dec c)]) start-pos)))]
+    (vec (for [i (range 4)
+               :let [pos [(- down-row i) (+ down-col i)]]
+               :when (in-bounds? pos)]
+           (get-in board pos)))))
+
+(is (= '[e w b e]
+       (diagonal-up-move [2 1] '[[e e e e]
+                                 [e e b e]
+                                 [e w w e]
+                                 [e e e e]])))
+
+(defn all-moves-from [[ridx cidx :as pos] board]
+  (let [size (count board)
+        row-level (get board ridx)
+        col-level (mapv #(get % cidx) board)
+        diag-down (diagonal-down-move pos board)
+        diag-up (diagonal-up-move pos board)]
+
+    (set [row-level col-level diag-down diag-up])))
+
+(is (= '#{[e w w e]
+          [e e w e]
+          [e w e]
+          [e w b e]}
+       (all-moves-from [2 1] '[[e e e e]
+                               [e e b e]
+                               [e w w e]
+                               [e e e e]])))
+
 (defn analyze [board color]
   )
 
