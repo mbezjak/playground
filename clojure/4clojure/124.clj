@@ -96,7 +96,9 @@
                                [e e e e]])))
 
 (defn analyze [board color]
-  )
+  (into {}
+        (for [pos (color-positions color board)]
+          [pos (set (filter valid? (all-moves-from pos board)))])))
 
 (is (= {[1 3] #{[1 2]}, [0 2] #{[1 2]}, [3 1] #{[2 1]}, [2 0] #{[2 1]}}
        (analyze '[[e e e e]
