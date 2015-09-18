@@ -1,15 +1,42 @@
 (use '[clojure.test :only (is)])
 
-(defn cut-children [node [root & children]]
-  (if (= node root)
-    (list root)
-    (apply list root (map #(cut-children node %) children))))
+(defn cut-node [target [root & children]]
+  (if (= target root)
+    nil
+    (apply list root (remove nil? (map #(cut-node target %) children)))))
 
-(is (= '(a (b (c (g) (h)) (d)))
-       (cut-children 'd '(a (b (c (g) (h)) (d (e) (f)))))))
+(is (= '(a (b (c (g) (h))))
+       (cut-node 'd '(a (b (c (g) (h)) (d (e) (f)))))))
 
-ee
-(defn reparent [root tree])
+(defn find-target
+  ([target tree] (find-target target tree nil))
+  ([target [root & children] parent]
+   (if (= target root)
+     {:children children, :parent parent}
+     (some #(find-target target % root) children))))
+
+(is (= (find-target 'd '(a (b (c (g) (h)) (d (e) (f)))))
+       {:children '((e) (f)), :parent 'b}))
+
+(defn reparent [new-root tree]
+  (let [{:keys [children parent]} (find-target new-root tree)
+        parent-as-right-tree (if parent [(reparent parent (cut-node new-root tree))] [])]
+    (apply list new-root (concat children parent-as-right-tree))))
+
+(defn reparent-4clojure [new-root tree]
+  (letfn [(cut-node [target [root & children]]
+            (if (= target root)
+              nil
+              (apply list root (remove nil? (map #(cut-node target %) children)))))
+          (find-target [target tree] (find-target-with-parent target tree nil))
+          (find-target-with-parent [target [root & children] parent]
+            (if (= target root)
+              {:children children, :parent parent}
+              (some #(find-target-with-parent target % root) children)))]
+
+    (let [{:keys [children parent]} (find-target new-root tree)
+          parent-as-right-tree (if parent [(reparent-4clojure parent (cut-node new-root tree))] [])]
+      (apply list new-root (concat children parent-as-right-tree)))))
 
 
 (is (= '(n)
