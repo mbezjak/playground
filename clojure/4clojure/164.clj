@@ -1,5 +1,31 @@
 (use '[clojure.test :only (is)])
 
+(defn filter-final-states [frontier accepted-states]
+  (into {} (filter #(contains? accepted-states (key %)) frontier)))
+
+(is (= '{a "1", c "3"} (filter-final-states '{a "1", b "2", c "3"} (set '[a c]))))
+
+(defn transition [frontier transitions]
+  (for [[state sentences] frontier
+        :when (contains? transitions state)
+        :let [alphabet->state (get transitions state)]]
+    [state (mapv (fn [sentence] #()) sentences)]))
+
+(is (= (transition '{a "1", b "2"} '{a {1 a}
+                                     b {2 b, 1 a}})
+       '{a ["11"]
+         b ["22" "21"]}))
+
+(is (= (transition '{a "1", b "2"} '{a {1 a}})
+       '{a ["11"]}))
+
+ee
+
+(defn next-step [{:keys [accepts]} frontier]
+  (let [final (filter-final-states frontier accepts)]
+    (lazy-cat (map val final)
+              )))
+
 (defn recognized [dfa]
   (let [[final continue] (partition-by #(contains? % accepted-states) frontier)]
     (lazy-cat (map #(get-string-for-final) final)
