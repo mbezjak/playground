@@ -3,34 +3,53 @@
 (defn filter-final-states [frontier accepted-states]
   (into {} (filter #(contains? accepted-states (key %)) frontier)))
 
-(is (= '{a "1", c "3"} (filter-final-states '{a "1", b "2", c "3"} (set '[a c]))))
+(is (= '{a ["1"], c ["3"]} (filter-final-states '{a ["1"], b ["2"], c ["3"]} (set '[a c]))))
 
 (defn transition [frontier transitions]
-  (for [[state sentences] frontier
-        :when (contains? transitions state)
-        :let [alphabet->state (get transitions state)]]
-    [state (mapv (fn [sentence] #()) sentences)]))
+  (apply merge-with concat
+         (for [[state sentences] frontier
+               [alphabet state] (or (get transitions state) {})
+               sentence sentences]
+           {state [(str sentence alphabet)]})))
 
 (is (= (transition '{a "1", b "2"} '{a {1 a}
                                      b {2 b, 1 a}})
-       '{a ["11"]
-         b ["22" "21"]}))
+       '{a ["11" "21"]
+         b ["22"]}))
 
 (is (= (transition '{a "1", b "2"} '{a {1 a}})
        '{a ["11"]}))
 
-ee
-
-(defn next-step [{:keys [accepts]} frontier]
-  (let [final (filter-final-states frontier accepts)]
-    (lazy-cat (map val final)
-              )))
+(defn next-step [{:keys [accepts transitions] :as dfa} frontier]
+  (let [final-states (filter-final-states frontier accepts)
+        values (mapcat val final-states)
+        new-frontier (transition frontier transitions)]
+    (if (empty? new-frontier)
+      values
+      (lazy-cat values
+                (next-step dfa new-frontier)))))
 
 (defn recognized [dfa]
-  (let [[final continue] (partition-by #(contains? % accepted-states) frontier)]
-    (lazy-cat (map #(get-string-for-final) final)
-              (map #(recognize dfa frontier) continue)
-              (map #(recognize dfa frontier) final))))
+  (next-step dfa {(:start dfa) [""]}))
+
+(defn recognized-4clojure [dfa]
+  (letfn [(filter-final-states [frontier accepted-states]
+            (into {} (filter #(contains? accepted-states (key %)) frontier)))
+          (transition [frontier transitions]
+            (apply merge-with concat
+                   (for [[state sentences] frontier
+                         [alphabet state] (or (get transitions state) {})
+                         sentence sentences]
+                     {state [(str sentence alphabet)]})))
+          (next-step [{:keys [accepts transitions] :as dfa} frontier]
+            (let [final-states (filter-final-states frontier accepts)
+                  values (mapcat val final-states)
+                  new-frontier (transition frontier transitions)]
+              (if (empty? new-frontier)
+                values
+                (lazy-cat values
+                          (next-step dfa new-frontier)))))]
+    (next-step dfa {(:start dfa) [""]})))
 
 (is (= #{"a" "ab" "abc"}
        (set (recognized '{:states #{q0 q1 q2 q3}
@@ -40,7 +59,6 @@ ee
                           :transitions {q0 {a q1}
                                         q1 {b q2}
                                         q2 {c q3}}}))))
-
 
 (is (= #{"hi" "hey" "hello"}
        (set (recognized '{:states #{q0 q1 q2 q3 q4 q5 q6 q7}
