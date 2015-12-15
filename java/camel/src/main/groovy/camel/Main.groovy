@@ -11,6 +11,11 @@ class Main {
         context.addRoutes(new RouteBuilder() {
             void configure() {
                 from('file:///tmp/in').to('file:///tmp/out')
+                from('file:///tmp/out').to('log://camel.SyncInToOut?showHeaders=true')
+                from('timer:hnb?period=1000')
+                    .to('http4://hnb.hr/tecajn/f151215.dat')
+                    .marshal().string('UTF-8')
+                    .to('log://camel.Hnb')
             }
         })
 
