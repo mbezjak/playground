@@ -20,6 +20,8 @@ class Main {
                     .to('log:camel.log.HnbExchangeRateFile')
                     .to('bean:exchangeRateConsumer?method=consume')
                     .log(LoggingLevel.INFO, 'camel.log.HnbEurAvgRate', 'EUR avg exchange rate: ${body}')
+
+                //from('direct:print').to('lpr://localhost/default?mediaSize=ISO_A4')
             }
         })
 
@@ -38,6 +40,8 @@ class Main {
             template.sendBody('file:///tmp/in', "Test message: $n")
         }
         template.sendBodyAndHeader('file:///tmp/in', new java.io.File('build.gradle'), "CamelFileName", 'build.gradle')
+
+        //template.sendBody('direct:print', 'The quick brown fox jumps over the lazy dog')
 
         Thread.sleep 60 * 1000
     }

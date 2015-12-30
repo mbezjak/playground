@@ -12,6 +12,7 @@ dependencies {
     compile 'org.apache.camel:camel-core:2.16.1'
     compile 'org.apache.camel:camel-groovy:2.16.1'
     compile 'org.apache.camel:camel-http4:2.16.1'
+    compile 'org.apache.camel:camel-printer:2.16.1'
 
     runtime 'ch.qos.logback:logback-classic:1.1.3'
 }
