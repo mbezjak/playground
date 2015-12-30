@@ -21,7 +21,7 @@ class Main {
                     .to('bean:exchangeRateConsumer?method=consume')
                     .log(LoggingLevel.INFO, 'camel.log.HnbEurAvgRate', 'EUR avg exchange rate: ${body}')
 
-                //from('direct:print').to('lpr://localhost/default?mediaSize=ISO_A4')
+                from('file:///tmp/print').to('lpr://localhost/default?mediaSize=ISO_A4')
             }
         })
 
@@ -41,7 +41,7 @@ class Main {
         }
         template.sendBodyAndHeader('file:///tmp/in', new java.io.File('build.gradle'), "CamelFileName", 'build.gradle')
 
-        //template.sendBody('direct:print', 'The quick brown fox jumps over the lazy dog')
+        //template.sendBody('file:///tmp/print/fox', 'The quick brown fox jumps over the lazy dog')
 
         Thread.sleep 60 * 1000
     }
