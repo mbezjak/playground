@@ -35,3 +35,17 @@ var partial = Immutable.fromJS({
 });
 
 console.log('Merge with partial = %o', person.mergeDeep(partial).toJS());
+
+
+var plugins = Immutable.fromJS([
+    { id : 'a', a : 1 },
+    { id : 'b', b : 2 },
+    { id : 'a', z : 9 }
+]);
+
+var grouper = function(plugin) {
+    return plugin.get('id');
+};
+
+console.log('Plugins = %o', plugins.toJS());
+console.log('Plugins as map = %o', plugins.groupBy(grouper).toJS());
