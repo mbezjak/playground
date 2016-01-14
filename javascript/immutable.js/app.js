@@ -6,7 +6,7 @@ var person = Immutable.fromJS({
         currentYears : 116
     },
     friends : [
-        { name : 'Mark' },
+        { name : 'Mark', age: 30 },
         { name : 'Jane' },
         { name : 'Susan' }
     ],
