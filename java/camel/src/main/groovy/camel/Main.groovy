@@ -10,11 +10,13 @@ class Main {
     static void main(String[] args) {
         def context = new DefaultCamelContext()
 
+        def sshUrl = 'root:password@host'
+
         context.addRoutes(new RouteBuilder() {
             void configure() {
                 from('file:///tmp/in').to('file:///tmp/out')
                 from('file:///tmp/out').to('log:camel.log.SyncInToOut?showHeaders=true')
-                from('timer:hnb?period=1000')
+                from('timer:hnb?period=5000')
                     .to('http4://hnb.hr/tecajn/f151215.dat')
                     .marshal().string('UTF-8')
                     .to('log:camel.log.HnbExchangeRateFile')
@@ -22,6 +24,7 @@ class Main {
                     .log(LoggingLevel.INFO, 'camel.log.HnbEurAvgRate', 'EUR avg exchange rate: ${body}')
 
                 from('file:///tmp/print').to('lpr://localhost/default?mediaSize=ISO_A4')
+                from('direct:ssh').to("ssh:$sshUrl").log(LoggingLevel.INFO, 'camel.log.Ssh', 'SSH exec: ${body}')
             }
         })
 
@@ -42,6 +45,7 @@ class Main {
         template.sendBodyAndHeader('file:///tmp/in', new java.io.File('build.gradle'), "CamelFileName", 'build.gradle')
 
         //template.sendBody('file:///tmp/print/fox', 'The quick brown fox jumps over the lazy dog')
+        template.sendBody('direct:ssh', 'ls -al /')
 
         Thread.sleep 60 * 1000
     }
