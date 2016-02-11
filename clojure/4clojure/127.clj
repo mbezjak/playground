@@ -1,6 +1,26 @@
 (use '[clojure.test :only (is)])
 
-(defn cross-section-area [bitmap])
+(defn int->bit-array [n])
+
+(defn pad-array [coll len])
+
+(defn ints->2d-bits [ints])
+
+(def sample-2d-bits
+  [[1 1 1 1]
+   [1 1 1 1]
+   [1 1 1 1]
+   [1 1 1 1]])
+
+(defn valid-cross-section? [2d-bits {:keys [initial-position orientation length]}]
+  (every? #(= 1 %) (for [x [1 2 3]
+                         y [1 2 3]]
+                     (get-in 2d-bits [x y]))))
+
+(defn all-cross-section-areas [2d-bits])
+
+(defn cross-section-area [bitmap]
+  (apply max (all-cross-section-areas (ints->2d-bits bitmap))))
 
 (is (= 10 (cross-section-area [15 15 15 15 15])))
 ;; 1111      1111
