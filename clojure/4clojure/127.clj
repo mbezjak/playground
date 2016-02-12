@@ -6,18 +6,49 @@
 
 (defn ints->2d-bits [ints])
 
-(def sample-2d-bits
+(def sample-bitmap
   [[1 1 1 1]
    [1 1 1 1]
    [1 1 1 1]
    [1 1 1 1]])
 
-(defn valid-cross-section? [2d-bits {:keys [initial-position orientation length]}]
-  (every? #(= 1 %) (for [x [1 2 3]
-                         y [1 2 3]]
-                     (get-in 2d-bits [x y]))))
+(defn make-triangle [length]
+  (for [x (range length)
+        y (range length)
+        :while (< y (- length x))]
+    [x y]))
 
-(defn all-cross-section-areas [2d-bits])
+(defn move-triangle [[point-x point-y] triangle]
+  (map (fn [[x y]] [(+ x point-x) (+ y point-y)]) triangle))
+
+(defn transpose-triangle [direction length triangle]
+  (for [[x y] triangle]
+    (if (= direction :vertical)
+      [x (- y (dec length))]
+      [(- x (dec length)) y])))
+
+(defn orient-triangle [orientation length triangle]
+  (condp = orientation
+    :nw triangle
+    :ne (transpose-triangle :vertical length triangle)
+    :sw (transpose-triangle :horizontal length triangle)
+    :se (transpose-triangle :horizontal length (transpose-triangle :vertical length triangle))))
+
+(defn valid-cross-section? [bitmap {:keys [initial-position orientation length]}]
+  (->> (make-triangle length)
+       (orient-triangle orientation length)
+       (move-triangle initial-position)
+       (map #(get-in bitmap %))
+       (every? #(= 1 %))))
+
+(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 1}))
+(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 2}))
+(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 3}))
+(is (not (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :se :length 2})))
+(is (valid-cross-section? sample-bitmap {:initial-position [0 2] :orientation :nw :length 2}))
+(is (not (valid-cross-section? sample-bitmap {:initial-position [0 2] :orientation :nw :length 3})))
+
+(defn all-cross-section-areas [bitmap])
 
 (defn cross-section-area [bitmap]
   (apply max (all-cross-section-areas (ints->2d-bits bitmap))))
