@@ -1,12 +1,48 @@
 (use '[clojure.test :only (is)])
 
-(defn int->bit-array [n])
+(defn int->bit-vector [n]
+  (letfn [(to-list [list x]
+            (if (zero? x)
+              list
+              (to-list (conj list (mod x 2)) (quot x 2))))]
+    (vec (to-list '() n))))
 
-(defn pad-array [coll len])
+(is (= [1 0 1 0]
+       (int->bit-vector 10)))
 
-(defn ints->2d-bits [ints])
+(defn pad-vector [length vector]
+  (vec (concat (repeat (- length (count vector)) 0) vector)))
 
-(def sample-bitmap
+(is (= [1 1 1] (pad-vector 3 [1 1 1])))
+(is (= [0 0 1 1 1] (pad-vector 5 [1 1 1])))
+
+(defn pad-matrix [matrix]
+  (let [max-length (apply max (map count matrix))]
+    (mapv (partial pad-vector max-length) matrix)))
+
+(defn bitmap->matrix [bitmap]
+  (->> bitmap
+       (map int->bit-vector)
+       (pad-matrix)))
+
+(is (= sample-matrix
+       (bitmap->matrix [15 15 15 15])))
+
+(is (= [[1 1 1 1]
+        [1 1 1 1]
+        [1 1 1 1]
+        [1 1 1 1]
+        [1 1 1 1]]
+       (bitmap->matrix [15 15 15 15 15])))
+
+(is (= [[0 0 0 0 1]
+        [0 0 0 1 1]
+        [0 0 1 1 1]
+        [0 1 1 1 1]
+        [1 1 1 1 1]]
+       (bitmap->matrix [1 3 7 15 31])))
+
+(def sample-matrix
   [[1 1 1 1]
    [1 1 1 1]
    [1 1 1 1]
@@ -34,24 +70,39 @@
     :sw (transpose-triangle :horizontal length triangle)
     :se (transpose-triangle :horizontal length (transpose-triangle :vertical length triangle))))
 
-(defn valid-cross-section? [bitmap {:keys [initial-position orientation length]}]
+(defn triangle-area [length]
+  (count (make-triangle length)))
+
+(defn valid-cross-section? [matrix {:keys [initial-position orientation length]}]
   (->> (make-triangle length)
        (orient-triangle orientation length)
        (move-triangle initial-position)
-       (map #(get-in bitmap %))
+       (map #(get-in matrix %))
        (every? #(= 1 %))))
 
-(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 1}))
-(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 2}))
-(is (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :nw :length 3}))
-(is (not (valid-cross-section? sample-bitmap {:initial-position [0 0] :orientation :se :length 2})))
-(is (valid-cross-section? sample-bitmap {:initial-position [0 2] :orientation :nw :length 2}))
-(is (not (valid-cross-section? sample-bitmap {:initial-position [0 2] :orientation :nw :length 3})))
+(is (valid-cross-section? sample-matrix {:initial-position [0 0] :orientation :nw :length 1}))
+(is (valid-cross-section? sample-matrix {:initial-position [0 0] :orientation :nw :length 2}))
+(is (valid-cross-section? sample-matrix {:initial-position [0 0] :orientation :nw :length 3}))
+(is (not (valid-cross-section? sample-matrix {:initial-position [0 0] :orientation :se :length 2})))
+(is (valid-cross-section? sample-matrix {:initial-position [0 2] :orientation :nw :length 2}))
+(is (not (valid-cross-section? sample-matrix {:initial-position [0 2] :orientation :nw :length 3})))
 
-(defn all-cross-section-areas [bitmap])
+(defn all-cross-section-areas [matrix]
+  (for [[row-idx columns] (map-indexed vector matrix)
+        [col-idx value]   (map-indexed vector columns)
+        :let [max-length (count columns)
+              initial-position [row-idx col-idx]]
+        orientation [:nw :ne :sw :se]
+        length (range 1 max-length)
+        :when (= value 1)
+        :while (valid-cross-section? matrix {:initial-position initial-position
+                                             :orientation orientation
+                                             :length length})]
+    (triangle-area (inc length))))
 
 (defn cross-section-area [bitmap]
-  (apply max (all-cross-section-areas (ints->2d-bits bitmap))))
+  (if-let [areas (not-empty (all-cross-section-areas (bitmap->matrix bitmap)))]
+    (apply max areas)))
 
 (is (= 10 (cross-section-area [15 15 15 15 15])))
 ;; 1111      1111
