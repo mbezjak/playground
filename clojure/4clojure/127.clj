@@ -25,6 +25,12 @@
        (map int->bit-vector)
        (pad-matrix)))
 
+(def sample-matrix
+  [[1 1 1 1]
+   [1 1 1 1]
+   [1 1 1 1]
+   [1 1 1 1]])
+
 (is (= sample-matrix
        (bitmap->matrix [15 15 15 15])))
 
@@ -42,17 +48,16 @@
         [1 1 1 1 1]]
        (bitmap->matrix [1 3 7 15 31])))
 
-(def sample-matrix
-  [[1 1 1 1]
-   [1 1 1 1]
-   [1 1 1 1]
-   [1 1 1 1]])
-
-(defn make-triangle [length]
+(defn make-right-triangle [length]
   (for [x (range length)
         y (range length)
         :while (< y (- length x))]
     [x y]))
+
+(defn make-oblique-triangle [height]
+  (for [x (range height)
+        y (range (dec (* 2 (inc x))))]
+    [x (- y x)]))
 
 (defn move-triangle [[point-x point-y] triangle]
   (map (fn [[x y]] [(+ x point-x) (+ y point-y)]) triangle))
@@ -62,6 +67,13 @@
     (if (= direction :vertical)
       [x (- y (dec length))]
       [(- x (dec length)) y])))
+
+(defn rotate-triangle-left [triangle]
+  (for [[x y] triangle]
+    [y x]))
+
+(defn rotate-triangle-right [triangle]
+  )
 
 (defn orient-triangle [orientation length triangle]
   (condp = orientation
@@ -74,7 +86,7 @@
   (count (make-triangle length)))
 
 (defn valid-cross-section? [matrix {:keys [initial-position orientation length]}]
-  (->> (make-triangle length)
+  (->> (make-triangle length orientation)
        (orient-triangle orientation length)
        (move-triangle initial-position)
        (map #(get-in matrix %))
@@ -86,19 +98,22 @@
 (is (not (valid-cross-section? sample-matrix {:initial-position [0 0] :orientation :se :length 2})))
 (is (valid-cross-section? sample-matrix {:initial-position [0 2] :orientation :nw :length 2}))
 (is (not (valid-cross-section? sample-matrix {:initial-position [0 2] :orientation :nw :length 3})))
+(is (valid-cross-section? [[1 1 1] [0 1 1]] {:initial-position [0 0] :orientation :nw :length 1}))
+(is (not (valid-cross-section? [[1 1 1] [0 1 1]] {:initial-position [0 0] :orientation :nw :length 2})))
+(is (valid-cross-section? [[1 1 1] [0 1 1]] {:initial-position [0 1] :orientation :n :length 2}))
 
 (defn all-cross-section-areas [matrix]
   (for [[row-idx columns] (map-indexed vector matrix)
         [col-idx value]   (map-indexed vector columns)
         :let [max-length (count columns)
               initial-position [row-idx col-idx]]
-        orientation [:nw :ne :sw :se]
+        orientation [:w :s :w :e :nw :ne :sw :se]
         length (range 1 max-length)
         :when (= value 1)
         :while (valid-cross-section? matrix {:initial-position initial-position
                                              :orientation orientation
                                              :length length})]
-    (triangle-area (inc length))))
+    (triangle-area length)))
 
 (defn cross-section-area [bitmap]
   (if-let [areas (not-empty (all-cross-section-areas (bitmap->matrix bitmap)))]
