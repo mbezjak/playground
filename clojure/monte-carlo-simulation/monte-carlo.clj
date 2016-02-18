@@ -4,7 +4,7 @@
                      (frequencies))]
     (/ (get results true 0) trials)))
 
-(defn in-rectangle [[x y]]
+(defn in-rectangle? [[x y]]
   (and (> x 0)
        (< x 9)
        (> y 0)
@@ -14,7 +14,7 @@
   (int (* limit (Math/random))))
 
 (defn rectangle-area-estimate []
-  (in-rectangle [(random-in-range 100) (random-in-range 100)]))
+  (in-rectangle? [(random-in-range 100) (random-in-range 100)]))
 
 (defn ratio-as-percentage [ratio]
   (* 100 (double ratio)))
