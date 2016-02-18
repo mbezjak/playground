@@ -62,11 +62,11 @@
 (defn move-triangle [[point-x point-y] triangle]
   (map (fn [[x y]] [(+ x point-x) (+ y point-y)]) triangle))
 
-(defn transpose-triangle [direction length triangle]
+(defn transpose-triangle [direction triangle]
   (for [[x y] triangle]
     (condp = direction
-      :vertical [x (- y (dec length))]
-      :horizontal [(- x (dec length)) y]
+      :vertical-right   [x (- y)]
+      :horizontal-right [(- x) y]
       :vertical-oblique [(- x) y])))
 
 (defn rotate-triangle-left [triangle]
@@ -79,18 +79,14 @@
 
 (defn oriented-triangle [orientation length]
   (condp = orientation
-    ;; orientation for :xx is wrong
     :nw (make-right-triangle length)
-    :ne (transpose-triangle :vertical length (make-right-triangle length))
-    :sw (transpose-triangle :horizontal length (make-right-triangle length))
-    :se (transpose-triangle :horizontal length (transpose-triangle :vertical length (make-right-triangle length)))
+    :ne (transpose-triangle :vertical-right (make-right-triangle length))
+    :sw (transpose-triangle :horizontal-right (make-right-triangle length))
+    :se (transpose-triangle :horizontal-right (transpose-triangle :vertical-right (make-right-triangle length)))
     :n  (make-oblique-triangle length)
-    :s  (transpose-triangle :vertical-oblique length (make-oblique-triangle length))
+    :s  (transpose-triangle :vertical-oblique (make-oblique-triangle length))
     :w  (rotate-triangle-left (make-oblique-triangle length))
     :e  (rotate-triangle-right (make-oblique-triangle length))))
-
-(defn triangle-area [length]
-  (count (make-triangle length)))
 
 (defn cross-section-values [matrix {:keys [initial-position orientation length]}]
   (->> (oriented-triangle orientation length)
@@ -117,18 +113,89 @@
         :let [max-length (count columns)
               initial-position [row-idx col-idx]]
         orientation [:w :s :w :e :nw :ne :sw :se]
-        length (range 1 (inc max-length))
+        length (range 2 (inc max-length))
         :when (= value 1)
         :while (valid-cross-section? matrix {:initial-position initial-position
                                              :orientation orientation
                                              :length length})]
-    (do
-      (println initial-position orientation length (oriented-triangle orientation length) (count (oriented-triangle orientation length)))
-      (count (oriented-triangle orientation length)))))
+    (count (oriented-triangle orientation length))))
 
 (defn cross-section-area [bitmap]
   (if-let [areas (not-empty (all-cross-section-areas (bitmap->matrix bitmap)))]
     (apply max areas)))
+
+
+(defn cross-section-area-4clojure [bitmap]
+  (letfn [(int->bit-vector [n]
+            (letfn [(to-list [list x]
+                      (if (zero? x)
+                        list
+                        (to-list (conj list (mod x 2)) (quot x 2))))]
+              (vec (to-list '() n))))
+          (pad-vector [length vector]
+            (vec (concat (repeat (- length (count vector)) 0) vector)))
+          (pad-matrix [matrix]
+            (let [max-length (apply max (map count matrix))]
+              (mapv (partial pad-vector max-length) matrix)))
+          (bitmap->matrix [bitmap]
+            (->> bitmap
+                 (map int->bit-vector)
+                 (pad-matrix)))
+          (make-right-triangle [length]
+            (for [x (range length)
+                  y (range length)
+                  :while (< y (- length x))]
+              [x y]))
+          (make-oblique-triangle [height]
+            (for [x (range height)
+                  y (range (dec (* 2 (inc x))))]
+              [x (- y x)]))
+          (move-triangle [[point-x point-y] triangle]
+            (map (fn [[x y]] [(+ x point-x) (+ y point-y)]) triangle))
+          (transpose-triangle [direction triangle]
+            (for [[x y] triangle]
+              (condp = direction
+                :vertical-right   [x (- y)]
+                :horizontal-right [(- x) y]
+                :vertical-oblique [(- x) y])))
+          (rotate-triangle-left [triangle]
+            (for [[x y] triangle]
+              [y x]))
+          (rotate-triangle-right [triangle]
+            (for [[x y] triangle]
+              [y (- x)]))
+          (oriented-triangle [orientation length]
+            (condp = orientation
+              :nw (make-right-triangle length)
+              :ne (transpose-triangle :vertical-right (make-right-triangle length))
+              :sw (transpose-triangle :horizontal-right (make-right-triangle length))
+              :se (transpose-triangle :horizontal-right (transpose-triangle :vertical-right (make-right-triangle length)))
+              :n  (make-oblique-triangle length)
+              :s  (transpose-triangle :vertical-oblique (make-oblique-triangle length))
+              :w  (rotate-triangle-left (make-oblique-triangle length))
+              :e  (rotate-triangle-right (make-oblique-triangle length))))
+          (cross-section-values [matrix {:keys [initial-position orientation length]}]
+            (->> (oriented-triangle orientation length)
+                 (move-triangle initial-position)
+                 (map #(get-in matrix %))))
+          (valid-cross-section? [matrix opts]
+            (->> (cross-section-values matrix opts)
+                 (every? #(= 1 %))))
+          (all-cross-section-areas [matrix]
+            (for [[row-idx columns] (map-indexed vector matrix)
+                  [col-idx value]   (map-indexed vector columns)
+                  :let [max-length (count columns)
+                        initial-position [row-idx col-idx]]
+                  orientation [:w :s :w :e :nw :ne :sw :se]
+                  length (range 2 (inc max-length))
+                  :when (= value 1)
+                  :while (valid-cross-section? matrix {:initial-position initial-position
+                                                       :orientation orientation
+                                                       :length length})]
+              (count (oriented-triangle orientation length))))]
+
+    (if-let [areas (not-empty (all-cross-section-areas (bitmap->matrix bitmap)))]
+      (apply max areas))))
 
 (is (= 10 (cross-section-area [15 15 15 15 15])))
 ;; 1111      1111
