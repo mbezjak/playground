@@ -1,8 +1,54 @@
 (use '[clojure.test :only (is)])
 
-(defn latin-square? [vectors])
+(defn latin-square? [vectors]
+  (let [size (count vectors)]
+    (and
+     (= (count (distinct (flatten vectors))) size)
+     (every? #(= (count (distinct %)) size) vectors)
+     (every? #(= (count (distinct %)) size) (apply map vector vectors)))))
 
-(defn latin-square-orders [vectors])
+(is (latin-square? [[1 2]
+                    [2 1]]))
+
+(is (not (latin-square? [[1]
+                         [2 1]])))
+
+(is (not (latin-square? [[1 2]
+                         [1 2]])))
+
+(is (not (latin-square? [[1 1]
+                         [2 2]])))
+
+(is (not (latin-square? [[1 3]
+                         [2 1]])))
+
+(defn order [latin-square]
+  (count latin-square))
+
+(defn pad-vectors [vectors]
+  (let [max-row-size (apply max (map count vectors))]
+    (mapv #(vector (concat % (repeat (- max-row-size (count %)) :e))) vectors)))
+
+(defn alignments [vectors]
+  (pad-vectors vectors))
+
+(is (= 1 (count (alignments '[[A B C D]
+                              [A C D B]
+                              [B A D C]
+                              [D C A B]]))))
+
+(is (= 2 (count (alignments [[2 4 6 3]
+                             [3 4 6 2]
+                             [6 2 4] ]))))
+
+(defn squares [alignment])
+
+(defn latin-square-orders [vectors]
+  (frequencies
+   (for [alignment (alignments vectors)
+         square (squares alignment)
+         :when (latin-square? square)]
+     (order square))))
 
 (is (= (latin-square-orders '[[A B C D]
                               [A C D B]
