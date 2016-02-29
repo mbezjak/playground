@@ -29,8 +29,32 @@
   (let [max-row-size (apply max (map count vectors))]
     (mapv #(vector (concat % (repeat (- max-row-size (count %)) :e))) vectors)))
 
+(defn rearrangements [vector]
+  (let [num-floaters (count (filter #{:e} vector))
+        rigid-part (filter #(not= % :e) vector)]
+    (if (zero? num-floaters)
+      [vector]
+      (vec (for [before (range (inc num-floaters))
+                 :let [after (- num-floaters before)]]
+             (vec (concat
+                   (repeat before :e)
+                   rigid-part
+                   (repeat after :e))))))))
+
+(is (= (rearrangements [1 2])
+       [[1 2]]))
+
+(is (= (rearrangements [1 2 :e])
+       [[1 2 :e]
+        [:e 1 2]]))
+
 (defn alignments [vectors]
-  (pad-vectors vectors))
+  (if (empty? vectors)
+    [[]]
+    (vec
+     (for [other (alignments (vec (rest vectors)))
+           arrangement (rearrangements (first vectors))]
+       (vec (concat [arrangement] other))))))
 
 (is (= 1 (count (alignments '[[A B C D]
                               [A C D B]
@@ -39,13 +63,13 @@
 
 (is (= 2 (count (alignments [[2 4 6 3]
                              [3 4 6 2]
-                             [6 2 4] ]))))
+                             [6 2 4 :e]]))))
 
 (defn squares [alignment])
 
 (defn latin-square-orders [vectors]
   (frequencies
-   (for [alignment (alignments vectors)
+   (for [alignment (alignments (pad-vectors vectors))
          square (squares alignment)
          :when (latin-square? square)]
      (order square))))
