@@ -10,6 +10,13 @@
 (is (latin-square? [[1 2]
                     [2 1]]))
 
+(is (latin-square? '[[A B C D E F]
+                     [B C D E F A]
+                     [C D E F A B]
+                     [D E F A B C]
+                     [E F A B C D]
+                     [F A B C D E]]))
+
 (is (not (latin-square? [[1]
                          [2 1]])))
 
@@ -27,7 +34,7 @@
 
 (defn pad-vectors [vectors]
   (let [max-row-size (apply max (map count vectors))]
-    (mapv #(vector (concat % (repeat (- max-row-size (count %)) :e))) vectors)))
+    (mapv #(vec (concat % (repeat (- max-row-size (count %)) :e))) vectors)))
 
 (defn rearrangements [vector]
   (let [num-floaters (count (filter #{:e} vector))
@@ -65,7 +72,52 @@
                              [3 4 6 2]
                              [6 2 4 :e]]))))
 
-(defn squares [alignment])
+(defn valid-square? [square]
+  (every? #(not= % :e) (flatten square)))
+
+(defn squares [alignment]
+  (for [[ridx row] (map-indexed vector alignment)
+        [cidx col] (map-indexed vector row)
+        size (range 2 (inc (min
+                            (- (count alignment) ridx)
+                            (- (count row) cidx))))
+        :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment ridx (+ ridx size)))]
+        :while (valid-square? potential-square)]
+    potential-square))
+
+(is (= (squares [[1 2 :e]
+                 [3 4 :e]])
+       [[[1 2]
+         [3 4]]]))
+
+(is (= (squares [[1 2 :e]
+                 [3 4 :e]
+                 [5 6 :e]])
+       [[[1 2]
+         [3 4]]
+        [[3 4]
+         [5 6]]]))
+
+(is (= (squares [[1 2]
+                 [3 4]])
+       [[[1 2]
+         [3 4]]]))
+
+(is (= (squares [[1 2 3]
+                 [4 5 6]
+                 [7 8 9]])
+       [[[1 2]
+         [4 5]]
+        [[1 2 3]
+         [4 5 6]
+         [7 8 9]]
+        [[2 3]
+         [5 6]]
+        [[4 5]
+         [7 8]]
+        [[5 6]
+         [8 9]]]))
+
 
 (defn latin-square-orders [vectors]
   (frequencies
