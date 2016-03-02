@@ -73,11 +73,12 @@
                              [6 2 4 :e]]))))
 
 (defn valid-square? [square]
-  (every? #(not= % :e) (flatten square)))
+  (not-any? #{:e} (flatten square)))
 
 (defn squares [alignment]
   (for [[ridx row] (map-indexed vector alignment)
         [cidx col] (map-indexed vector row)
+        :when (not= col :e)
         size (range 2 (inc (min
                             (- (count alignment) ridx)
                             (- (count row) cidx))))
