@@ -118,13 +118,18 @@
         [[5 6]
          [8 9]]]))
 
+(defn latin-squares [vectors]
+  (for [alignment (alignments (pad-vectors vectors))
+        square (squares alignment)
+        :when (latin-square? square)]
+    square))
 
 (defn latin-square-orders [vectors]
-  (frequencies
-   (for [alignment (alignments (pad-vectors vectors))
-         square (squares alignment)
-         :when (latin-square? square)]
-     (order square))))
+  (->> vectors
+       (latin-squares)
+       (distinct)
+       (map order)
+       (frequencies)))
 
 (is (= (latin-square-orders '[[A B C D]
                               [A C D B]
