@@ -76,18 +76,18 @@
   (not-any? #{:e} (flatten square)))
 
 (def squares (memoize (fn [alignment]
-                (if (empty? alignment)
-                  []
-                  (let [[row & other] alignment
-                        found-squares (for [[cidx col] (map-indexed vector row)
-                                            :when (not= col :e)
-                                            size (range 2 (inc (min
-                                                                (count alignment)
-                                                                (- (count row) cidx))))
-                                            :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment 0 size))]
-                                            :while (valid-square? potential-square)]
-                                        potential-square)]
-                    (vec (concat found-squares (squares (vec other)))))))))
+                        (if (empty? alignment)
+                          []
+                          (let [[row & other] alignment
+                                found-squares (for [[cidx col] (map-indexed vector row)
+                                                    :when (not= col :e)
+                                                    size (range 2 (inc (min
+                                                                        (count alignment)
+                                                                        (- (count row) cidx))))
+                                                    :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment 0 size))]
+                                                    :while (valid-square? potential-square)]
+                                                potential-square)]
+                            (vec (concat found-squares (squares (vec other)))))))))
 
 (is (= (squares [[1 2 :e]
                  [3 4 :e]])
@@ -134,6 +134,63 @@
        (distinct)
        (map order)
        (frequencies)))
+
+(defn latin-square-orders-4clojure [vectors]
+  (letfn [(latin-square? [vectors]
+            (let [size (count vectors)]
+              (and
+               (= (count (distinct (flatten vectors))) size)
+               (every? #(= (count (distinct %)) size) vectors)
+               (every? #(= (count (distinct %)) size) (apply map vector vectors)))))
+          (order [latin-square]
+            (count latin-square))
+          (pad-vectors [vectors]
+            (let [max-row-size (apply max (map count vectors))]
+              (mapv #(vec (concat % (repeat (- max-row-size (count %)) :e))) vectors)))
+          (rearrangements [vector]
+            (let [num-floaters (count (filter #{:e} vector))
+                  rigid-part (filter #(not= % :e) vector)]
+              (if (zero? num-floaters)
+                [vector]
+                (vec (for [before (range (inc num-floaters))
+                           :let [after (- num-floaters before)]]
+                       (vec (concat
+                             (repeat before :e)
+                             rigid-part
+                             (repeat after :e))))))))
+          (alignments [vectors]
+            (if (empty? vectors)
+              [[]]
+              (vec
+               (for [other (alignments (vec (rest vectors)))
+                     arrangement (rearrangements (first vectors))]
+                 (vec (concat [arrangement] other))))))
+          (valid-square? [square]
+            (not-any? #{:e} (flatten square)))]
+    (let [squares-impl (memoize (fn [squares-fn alignment]
+                                  (if (empty? alignment)
+                                    []
+                                    (let [[row & other] alignment
+                                          found-squares (for [[cidx col] (map-indexed vector row)
+                                                              :when (not= col :e)
+                                                              size (range 2 (inc (min
+                                                                                  (count alignment)
+                                                                                  (- (count row) cidx))))
+                                                              :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment 0 size))]
+                                                              :while (valid-square? potential-square)]
+                                                          potential-square)]
+                                      (vec (concat found-squares (squares-fn squares-fn (vec other))))))))
+          squares (partial squares-impl squares-impl)]
+      (letfn [(latin-squares [vectors]
+                (for [alignment (alignments (pad-vectors vectors))
+                      square (squares alignment)
+                      :when (latin-square? square)]
+                  square))]
+        (->> vectors
+             (latin-squares)
+             (distinct)
+             (map order)
+             (frequencies))))))
 
 (is (= (latin-square-orders '[[A B C D]
                               [A C D B]
