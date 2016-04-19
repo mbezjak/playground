@@ -75,16 +75,19 @@
 (defn valid-square? [square]
   (not-any? #{:e} (flatten square)))
 
-(defn squares [alignment]
-  (for [[ridx row] (map-indexed vector alignment)
-        [cidx col] (map-indexed vector row)
-        :when (not= col :e)
-        size (range 2 (inc (min
-                            (- (count alignment) ridx)
-                            (- (count row) cidx))))
-        :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment ridx (+ ridx size)))]
-        :while (valid-square? potential-square)]
-    potential-square))
+(def squares (memoize (fn [alignment]
+                (if (empty? alignment)
+                  []
+                  (let [[row & other] alignment
+                        found-squares (for [[cidx col] (map-indexed vector row)
+                                            :when (not= col :e)
+                                            size (range 2 (inc (min
+                                                                (count alignment)
+                                                                (- (count row) cidx))))
+                                            :let [potential-square (mapv #(subvec % cidx (+ cidx size)) (subvec alignment 0 size))]
+                                            :while (valid-square? potential-square)]
+                                        potential-square)]
+                    (vec (concat found-squares (squares (vec other)))))))))
 
 (is (= (squares [[1 2 :e]
                  [3 4 :e]])
