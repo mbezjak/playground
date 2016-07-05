@@ -8,8 +8,8 @@ set -o errexit
 
 declare -r file="${1:-build}"
 
-if [[ $file == repl ]]; then
-    rlwrap java -cp "cljs.jar:src" clojure.main repl.clj
+if [[ $file =~ ^.*repl$ ]]; then
+    rlwrap java -cp "cljs.jar:src" clojure.main "${file}.clj"
 else
     java -cp "cljs.jar:src" clojure.main "${file}.clj"
 fi
