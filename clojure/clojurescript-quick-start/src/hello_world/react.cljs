@@ -1,4 +1,4 @@
-(ns hello-world.core
+(ns hello-world.react
   (:require cljsjs.react))
 
 (enable-console-print!)

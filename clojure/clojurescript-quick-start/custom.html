@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>ClojureScript Quick Start</title>
+  </head>
+
+  <body>
+    <script>
+      window.yayQuery = function() {
+          var yay = {};
+          yay.sayHello = function(message) {
+              console.log(message);
+          };
+          yay.getMessage = function() {
+              return 'Hello, world!';
+          };
+          return yay;
+      };
+    </script>
+    <script src="out/main.js"></script>
+  </body>
+</html>
