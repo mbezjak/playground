@@ -1,4 +1,5 @@
-(ns hello-world.custom)
+(ns hello-world.custom
+  (:require [yq]))
 
 (enable-console-print!)
 
