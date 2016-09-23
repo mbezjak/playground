@@ -43,4 +43,36 @@
 (is (= (paren-ab "(aab)")
        [:paren-wrapped "a" "a" "b"]))
 
+(is (= (paren-ab "(aab)" :unhide :content)
+       [:paren-wrapped "(" "a" "a" "b" ")"]))
+
+(def right-recursion
+  (insta/parser "S = 'a' S | Epsilon"))
+
+(is (= (right-recursion "aaaa")
+       [:S "a" [:S "a" [:S "a" [:S "a" [:S]]]]]))
+
+(def left-recursion
+  (insta/parser "S = 'a'*"))
+
+(is (= (left-recursion "aaaa")
+       [:S "a" "a" "a" "a"]))
+
+(def ambiguous
+  (insta/parser
+   "S = A A
+    A = 'a'*"))
+
+(is (= (ambiguous "aaaa")
+       [:S
+        [:A "a"]
+        [:A "a" "a" "a"]]))
+
+(is (= (set (insta/parses ambiguous "aaaa"))
+       (set [[:S [:A] [:A "a" "a" "a" "a"]]
+             [:S [:A "a"] [:A "a" "a" "a"]]
+             [:S [:A "a" "a"] [:A "a" "a"]]
+             [:S [:A "a" "a" "a"] [:A "a"]]
+             [:S [:A "a" "a" "a" "a"] [:A]]])))
+
 (defn -main [& args])
