@@ -75,4 +75,45 @@
              [:S [:A "a" "a" "a"] [:A "a"]]
              [:S [:A "a" "a" "a" "a"] [:A]]])))
 
+(def words-and-numbers
+  (insta/parser
+   "sentence = token (<whitespace> token)*
+    <token> = word | number
+    whitespace = #'\\s+'
+    word = #'[a-zA-Z]+'
+    number = #'[0-9]+'"))
+
+(is (= (words-and-numbers "abc 123 def")
+       [:sentence [:word "abc"] [:number "123"] [:word "def"]]))
+
+(def repeated-a
+  (insta/parser "S = 'a'+"))
+
+(is (= (set (insta/parses repeated-a "aaab" :partial true))
+       (set [[:S "a"]
+             [:S "a" "a"]
+             [:S "a" "a" "a"]])))
+
+(def lookahead-example
+  (insta/parser
+   "S = &'ab' ('a' | 'b')+"))
+
+(is (= (lookahead-example "abaab")
+       [:S "a" "b" "a" "a" "b"]))
+
+(is (= (:reason (lookahead-example "bbaab"))
+       [{:tag :string, :expecting "ab"}]))
+
+(def same-length-abc
+  (insta/parser
+   "S = &(A 'c') 'a'+ B
+    A = 'a' A? 'b'
+    <B> = 'b' B? 'c'"))
+
+(is (= (same-length-abc "aaabbbccc")
+       [:S "a" "a" "a" "b" "b" "b" "c" "c" "c"]))
+
+(is (= (:reason (same-length-abc "aabbbccc"))
+       [{:tag :string, :expecting "c"}]))
+
 (defn -main [& args])
