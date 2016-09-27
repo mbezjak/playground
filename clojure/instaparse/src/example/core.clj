@@ -116,4 +116,63 @@
 (is (= (:reason (same-length-abc "aabbbccc"))
        [{:tag :string, :expecting "c"}]))
 
+(def negative-lookahead-example
+  (insta/parser
+   "S = !'ab' ('a' | 'b')+"))
+
+(is (= (:reason (negative-lookahead-example "abaaab"))
+       [{:tag :negative-lookahead, :expecting {:NOT "\"ab\""}}]))
+
+(def ambiguous-tokenizer
+  (insta/parser
+   "sentence = token (<whitespace> token)*
+    <token> = keyword | identifier
+    whitespace = #'\\s+'
+    identifier = #'[a-zA-Z]+'
+    keyword = 'cond' | 'defn'"))
+
+(is (= (set (insta/parses ambiguous-tokenizer "defn my cond"))
+       (set [[:sentence [:identifier "defn"] [:identifier "my"] [:identifier "cond"]]
+             [:sentence [:keyword "defn"] [:identifier "my"] [:identifier "cond"]]
+             [:sentence [:identifier "defn"] [:identifier "my"] [:keyword "cond"]]
+             [:sentence [:keyword "defn"] [:identifier "my"] [:keyword "cond"]]])))
+
+(def unambiguous-tokenizer
+  (insta/parser
+   "sentence = token (<whitespace> token)*
+    <token> = keyword | !keyword identifier
+    whitespace = #'\\s+'
+    identifier = #'[a-zA-Z]+'
+    keyword = 'cond' | 'defn'"))
+
+(is (= (insta/parses unambiguous-tokenizer "defn my cond")
+       [[:sentence [:keyword "defn"] [:identifier "my"] [:keyword "cond"]]]))
+
+(def preferential-tokenizer
+  (insta/parser
+   "sentence = token (<whitespace> token)*
+    <token> = keyword / identifier
+    whitespace = #'\\s+'
+    identifier = #'[a-zA-Z]+'
+    keyword = 'cond' | 'defn'"))
+
+(is (= (first (insta/parses preferential-tokenizer "defn my cond"))
+       [:sentence [:keyword "defn"] [:identifier "my"] [:keyword "cond"]]))
+
+;; using get-failure
+(is (not (nil? (insta/get-failure (insta/parses preferential-tokenizer "1 does not parse")))))
+
+;; total parse mode
+(is (= (repeated-a "aabaaa" :total true)
+       [:S "a" "a" [:instaparse/failure "baaa"]]))
+
+(is (insta/failure? (repeated-a "aabaa" :total true)))
+
+(is (= (:reason (insta/get-failure (repeated-a "aabaa" :total true)))
+       [{:tag :string, :expecting "a"}]))
+
+;; another start rule
+(is (= (as-and-bs "aaa" :start :A)
+       [:A "a" "a" "a"]))
+
 (defn -main [& args])
