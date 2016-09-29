@@ -175,4 +175,65 @@
 (is (= (as-and-bs "aaa" :start :A)
        [:A "a" "a" "a"]))
 
+(def words-and-numbers-one-character-at-a-time
+  (insta/parser
+   "sentence = token(<whitespace> token)*
+    <token> = word | number
+    whitespace = #'\\s+'
+    word = letter+
+    number = digit+
+    <letter> = #'[a-zA-Z]'
+    <digit> = #'[0-9]'"))
+
+(is (= (words-and-numbers-one-character-at-a-time "abc 123 def")
+       [:sentence [:word "a" "b" "c"] [:number "1" "2" "3"] [:word "d" "e" "f"]]))
+
+(is (= (insta/transform
+        {:word str
+         :number (comp clojure.edn/read-string str)}
+        (words-and-numbers-one-character-at-a-time "abc 123 def"))
+       [:sentence "abc" 123 "def"]))
+
+(def arithmetic
+  (insta/parser
+   "expr = add-sub
+    <add-sub> = mul-div | add | sub
+    add = add-sub <'+'> mul-div
+    sub = add-sub <'-'> mul-div
+    <mul-div> = term | mul | div
+    mul = mul-div <'*'> term
+    div = mul-div <'/'> term
+    <term> = number | <'('> add-sub <')'>
+    number = #'[0-9]+'"))
+
+(is (= (arithmetic "1-2/(3-4)+5*6")
+       [:expr
+        [:add
+         [:sub
+          [:number "1"]
+          [:div [:number "2"] [:sub [:number "3"] [:number "4"]]]]
+         [:mul [:number "5"] [:number "6"]]]]))
+
+(is (= (->> (arithmetic "1-2/(3-4)+5*6")
+            (insta/transform
+             {:add +, :sub -, :mul *, :div /
+              :number clojure.edn/read-string
+              :expr identity}))
+       33))
+
+;; transform of parses or failure
+(is (= (->> (insta/parses ambiguous "aaaa")
+            (insta/transform {:A str}))
+       [[:S "a" "aaa"]
+        [:S "aaaa" ""]
+        [:S "aa" "aa"]
+        [:S "aaa" "a"]
+        [:S "" "aaaa"]]))
+
+(is (= (->> (insta/parses ambiguous "aabaa")
+            (insta/get-failure)
+            (insta/transform {:A str})
+            (:reason))
+       [{:tag :string, :expecting "a"}]))
+
 (defn -main [& args])
