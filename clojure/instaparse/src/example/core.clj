@@ -236,4 +236,41 @@
             (:reason))
        [{:tag :string, :expecting "a"}]))
 
-(defn -main [& args])
+(is (= (insta/span (as-and-bs "aabbbaaaaabb"))
+       [0 12]))
+
+(def multiline-text "This is line 1\nThis is line 2")
+
+(is (= (words-and-numbers multiline-text)
+       [:sentence
+        [:word "This"] [:word "is"] [:word "line"] [:number "1"]
+        [:word "This"] [:word "is"] [:word "line"] [:number "2"]]))
+
+(def parsed-multiline-text-with-line-and-column-metadata
+  (insta/add-line-and-column-info-to-metadata
+   multiline-text
+   (words-and-numbers multiline-text)))
+
+(is (= parsed-multiline-text-with-line-and-column-metadata
+       [:sentence
+        [:word "This"] [:word "is"] [:word "line"] [:number "1"]
+        [:word "This"] [:word "is"] [:word "line"] [:number "2"]]))
+
+(is (= (meta parsed-multiline-text-with-line-and-column-metadata)
+       {:instaparse.gll/start-column 1
+        :instaparse.gll/start-line 1
+        :instaparse.gll/start-index 0
+        :instaparse.gll/end-column 15
+        :instaparse.gll/end-line 2
+        :instaparse.gll/end-index 29}))
+
+(is (= ((insta/parser "S = 'a'+" :string-ci true) "AaaAaa")
+       [:S "a" "a" "a" "a" "a" "a"]))
+
+(is (= ((insta/parser "S = #'(?i)a'+") "AaaAaa")
+       [:S "A" "a" "a" "A" "a" "a"]))
+
+(defn -main [& args]
+  (if (and (not (empty? args))
+           (= (first args) "visualize"))
+    (insta/visualize (as-and-bs "aaabbab"))))
