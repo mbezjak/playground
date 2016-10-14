@@ -1,0 +1,17 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+version = '0.1'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+mainClassName = 'example.Main'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile 'com.datomic:datomic-free:0.9.5404'
+}
