@@ -1,7 +1,6 @@
 package tutorial
 
 import datomic.Peer
-import datomic.Connection
 import datomic.Util
 
 class Main {
@@ -23,11 +22,44 @@ class Main {
 
         def db = conn.db()
 
+        simpleFind(db)
+        simplePull(db)
+        neighborhood(db)
+        reverseDirection(db)
+    }
+
+    private static void simpleFind(db) {
         def query = "[:find ?c :where [?c :community/name]]"
         def results = Peer.query(query, db)
         def firstEntity = db.entity(results.first().first())
+        def name = firstEntity.get(':community/name')
+        def keys = firstEntity.keySet()
         println "$query size = ${results.size()}"
-        println "$query first entity = ${firstEntity}; name = ${firstEntity.get(':community/name')}"
+        println "$query first entity = ${firstEntity}; name = $name; keys = $keys"
+    }
+
+    private static void simplePull(db) {
+        def query = "[:find (pull ?c [*]) :where [?c :community/name]]"
+        def results = Peer.query(query, db)
+        println "$query first result = ${results.first()}"
+    }
+
+    private static void neighborhood(db) {
+        def query = "[:find ?c :where [?c :community/name]]"
+        def results = Peer.query(query, db)
+        def entity = db.entity(results.first().first())
+        def neighborhood = entity.get(':community/neighborhood')
+        def name = neighborhood.get(':neighborhood/name')
+        println "neighborhood name = $name"
+    }
+
+    private static void reverseDirection(db) {
+        def query = "[:find ?c :where [?c :community/name]]"
+        def results = Peer.query(query, db)
+        def community = db.entity(results.first().first())
+        def neighborhood = community.get(':community/neighborhood')
+        def communities = neighborhood.get(':community/_neighborhood')*.get(':community/name')
+        println "Communities for neighborhood=${neighborhood}: $communities"
     }
 
 }
