@@ -26,6 +26,16 @@ class Main {
         simplePull(db)
         neighborhood(db)
         reverseDirection(db)
+        forAttributeValue(db)
+        onlyAttributeValue(db)
+        multiAttributeValue(db)
+        cardinalityMany(db)
+        byAttributeValue(db)
+        acrossReferences(db)
+        acrossReferencesWithRegion(db)
+        parametrized(db)
+        parametrizedList(db)
+        parametrizedTuples(db)
     }
 
     private static void simpleFind(db) {
@@ -60,6 +70,105 @@ class Main {
         def neighborhood = community.get(':community/neighborhood')
         def communities = neighborhood.get(':community/_neighborhood')*.get(':community/name')
         println "Communities for neighborhood=${neighborhood}: $communities"
+    }
+
+    private static void forAttributeValue(db) {
+        def query = "[:find ?c ?n :where [?c :community/name ?n]]"
+        def results = Peer.query(query, db)
+        def names = results*.get(1).take(10)
+        println "Community names = $names"
+    }
+
+    private static void onlyAttributeValue(db) {
+        def query = "[:find [?n ...] :where [_ :community/name ?n]]"
+        def results = Peer.query(query, db)
+        def names = results.take(10)
+        println "Only community names = $names"
+    }
+
+    private static void multiAttributeValue(db) {
+        def query = "[:find ?n ?u :where [?c :community/name ?n] [?c :community/url ?u]]"
+        def results = Peer.query(query, db)
+        println "Community name + url = ${results.take(10)}"
+    }
+
+    private static void cardinalityMany(db) {
+        def query = '[:find ?e ?c :where [?e :community/name "belltown"] [?e :community/category ?c]]'
+        def results = Peer.query(query, db)
+        println "Cardinality many = ${results.take(10)}"
+    }
+
+    private static void byAttributeValue(db) {
+        def query = "[:find [?n ...] :where [?c :community/name ?n] [?c :community/type :community.type/twitter]]"
+        def results = Peer.query(query, db)
+        println "Community names = ${results}"
+    }
+
+    private static void acrossReferences(db) {
+        def query = """
+            [:find [?c_name ...]
+             :where
+             [?c :community/name ?c_name]
+             [?c :community/neighborhood ?n]
+             [?n :neighborhood/district ?d]
+             [?d :district/region :region/ne]]
+        """
+        def results = Peer.query(query, db)
+        println "Community names in NE region = ${results}"
+    }
+
+    private static void acrossReferencesWithRegion(db) {
+        def query = """
+            [:find ?c_name ?r_name
+             :where
+             [?c :community/name ?c_name]
+             [?c :community/neighborhood ?n]
+             [?n :neighborhood/district ?d]
+             [?d :district/region ?r]
+             [?r :db/ident ?r_name]]
+        """
+        def results = Peer.query(query, db)
+        println "Community names and region = ${results.take(10)}"
+    }
+
+    private static void parametrized(db) {
+        def query = """
+            [:find [?n ...]
+            :in \$ ?t
+            :where
+            [?c :community/name ?n]
+            [?c :community/type ?t]]
+        """
+        def results = Peer.query(query, db, ":community.type/facebook-page")
+        println "Parametrized community names = ${results}"
+    }
+
+    private static void parametrizedList(db) {
+        def query = """
+            [:find ?n ?t
+            :in \$ [?t ...]
+            :where
+            [?c :community/name ?n]
+            [?c :community/type ?t]]
+        """
+        def results = Peer.query(query, db, [":community.type/facebook-page", ":community.type/twitter"])
+        println "Parametrized list community name and type = ${results}"
+    }
+
+    private static void parametrizedTuples(db) {
+        def query = """
+            [:find ?n ?t ?ot
+            :in \$ [[?t ?ot]]
+            :where
+            [?c :community/name ?n]
+            [?c :community/type ?t]
+            [?c :community/orgtype ?ot]]
+        """
+        def results = Peer.query(query, db, [
+            [":community.type/email-list", ":community.orgtype/community"],
+            [":community.type/website", ":community.orgtype/commercial"]
+        ])
+        println "Parametrized tuples communities = ${results}"
     }
 
 }
