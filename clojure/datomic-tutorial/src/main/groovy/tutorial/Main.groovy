@@ -36,6 +36,11 @@ class Main {
         parametrized(db)
         parametrizedList(db)
         parametrizedTuples(db)
+        function(db)
+        fulltext(db)
+        fulltextWithParameter(db)
+        rulesSimple(db)
+        rulesComplex(db)
     }
 
     private static void simpleFind(db) {
@@ -169,6 +174,90 @@ class Main {
             [":community.type/website", ":community.orgtype/commercial"]
         ])
         println "Parametrized tuples communities = ${results}"
+    }
+
+    private static void function(db) {
+        def query = """
+            [:find [?n ...]
+            :where
+            [?c :community/name ?n]
+            [(.compareTo ?n "C") ?res]
+            [(< ?res 0)]]
+        """
+        def results = Peer.query(query, db)
+        println "Function in query = $results"
+    }
+
+    private static void fulltext(db) {
+        def query = """
+            [:find [?n ...]
+            :where
+            [(fulltext \$ :community/name "wallingford") [[?e ?n]]]]
+        """
+        def results = Peer.query(query, db)
+        println "Fulltext = $results"
+    }
+
+    private static void fulltextWithParameter(db) {
+        def query = """
+            [:find ?name ?cat
+            :in \$ ?type ?search
+            :where
+            [?c :community/name ?name]
+            [?c :community/type ?type]
+            [(fulltext \$ :community/category ?search) [[?c ?cat]]]]
+        """
+        def results = Peer.query(query, db, ":community.type/website", "food")
+        println "Fulltext with parameters = $results"
+    }
+
+    private static void rulesSimple(db) {
+        def rules = """
+            [[[region ?c ?r]
+              [?c :community/neighborhood ?n]
+              [?n :neighborhood/district ?d]
+              [?d :district/region ?re]
+              [?re :db/ident ?r]]]
+        """
+        def query = """
+            [:find [?n ...]
+            :in \$ %
+            :where
+            [?c :community/name ?n]
+            (region ?c :region/ne)]
+        """
+        def results = Peer.query(query, db, rules)
+        println "Rules simple = $results"
+    }
+
+    private static void rulesComplex(db) {
+        def rules = """
+            [[[region ?c ?r]
+              [?c :community/neighborhood ?n]
+              [?n :neighborhood/district ?d]
+              [?d :district/region ?re]
+              [?re :db/ident ?r]]
+             [[social-media ?c]
+              [?c :community/type :community.type/twitter]]
+             [[social-media ?c]
+              [?c :community/type :community.type/facebook-page]]
+             [[northern ?c] (region ?c :region/ne)]
+             [[northern ?c] (region ?c :region/n)]
+             [[northern ?c] (region ?c :region/nw)]
+             [[southern ?c] (region ?c :region/sw)]
+             [[southern ?c] (region ?c :region/s)]
+             [[southern ?c] (region ?c :region/se)]]
+        """
+        def query = """
+            [:find [?n ...]
+            :in \$ %
+            :where
+            [?c :community/name ?n]
+            (southern ?c)
+            (social-media ?c)]
+        """
+        def results = Peer.query(query, db, rules)
+        println "Rules complex = $results"
     }
 
 }
