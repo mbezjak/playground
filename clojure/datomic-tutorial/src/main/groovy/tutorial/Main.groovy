@@ -2,6 +2,7 @@ package tutorial
 
 import datomic.Peer
 import datomic.Util
+import datomic.Connection
 
 class Main {
 
@@ -41,6 +42,25 @@ class Main {
         fulltextWithParameter(db)
         rulesSimple(db)
         rulesComplex(db)
+
+        def (dataTxDate, schemaTxDate) = txInstant(db)
+        assert count(db.asOf(schemaTxDate))  == 0
+        assert count(db.asOf(dataTxDate))    == 150
+        assert count(db.since(schemaTxDate)) == 150
+        assert count(db.since(dataTxDate))   == 0
+        assert count(db.asOf(new Date()))    == 150
+
+        def newDataReader = new FileReader("src/main/resources/seattle-data1.edn")
+        def newDataTx = Util.readAll(newDataReader).get(0)
+        newDataReader.close()
+        def dbIfNewData = db.with(newDataTx).get(Connection.DB_AFTER)
+
+        assert count(dbIfNewData) == 258
+        assert count(db)          == 150
+        assert count(conn.db())   == 150
+
+        def newDataTxResult = conn.transact(newDataTx).get()
+        assert count(conn.db().since(dataTxDate)) == 108
     }
 
     private static void simpleFind(db) {
@@ -258,6 +278,28 @@ class Main {
         """
         def results = Peer.query(query, db, rules)
         println "Rules complex = $results"
+    }
+
+    private static List<Date> txInstant(db) {
+        def query = """
+            [:find [?when ...]
+            :where
+            [?tx :db/txInstant ?when]]
+        """
+        def results = Peer.query(query, db)
+        println "Tx instant = $results"
+
+        results.sort(false).reverse().take(2)
+    }
+
+    private static int count(db) {
+        def query = """
+            [:find [?c ...]
+            :where
+            [?c :community/name]]
+        """
+        def results = Peer.query(query, db)
+        results.size()
     }
 
 }
