@@ -61,6 +61,9 @@ class Main {
 
         def newDataTxResult = conn.transact(newDataTx).get()
         assert count(conn.db().since(dataTxDate)) == 108
+
+        insertNew(conn)
+        assert count(conn.db()) == 259
     }
 
     private static void simpleFind(db) {
@@ -300,6 +303,22 @@ class Main {
         """
         def results = Peer.query(query, db)
         results.size()
+    }
+
+    private static void insertNew(conn) {
+        def neighborhoodId = Peer.query('[:find ?n . :where [?n :neighborhood/name]]', conn.db())
+
+        def tx = """
+            [{:db/id #db/id[:db.part/user]
+              :community/name "Foo"
+              :community/url "http://example.com"
+              :community/neighborhood [:neighborhood/name "Alki"]
+              :community/category ["Example users"]
+              :community/orgtype :community.orgtype/personal
+              :community/type :community.type/wiki
+            }]
+        """
+        conn.transact(Util.readAll(new StringReader(tx)).get(0)).get()
     }
 
 }
