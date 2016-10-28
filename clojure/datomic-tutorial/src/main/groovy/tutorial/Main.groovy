@@ -64,6 +64,7 @@ class Main {
 
         insertNew(conn)
         assert count(conn.db()) == 259
+        retractUrl(conn)
     }
 
     private static void simpleFind(db) {
@@ -306,8 +307,6 @@ class Main {
     }
 
     private static void insertNew(conn) {
-        def neighborhoodId = Peer.query('[:find ?n . :where [?n :neighborhood/name]]', conn.db())
-
         def tx = """
             [{:db/id #db/id[:db.part/user]
               :community/name "Foo"
@@ -319,6 +318,30 @@ class Main {
             }]
         """
         conn.transact(Util.readAll(new StringReader(tx)).get(0)).get()
+    }
+
+    private static String fooCommunityUrl(db) {
+        def query = """
+            [:find ?u .
+             :where
+             [?e :community/name "Foo"]
+             [?e :community/url ?u]]
+        """
+
+        Peer.query(query, db)
+    }
+
+    private static void retractUrl(conn) {
+        assert fooCommunityUrl(conn.db()) == 'http://example.com'
+        def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+
+        def doesNothingBecauseUrlDoesNotMatch = "[[:db/retract $communityId :community/url \"ewq\"]]"
+        conn.transact(Util.read(doesNothingBecauseUrlDoesNotMatch)).get()
+        assert fooCommunityUrl(conn.db()) == 'http://example.com'
+
+        def retract = "[[:db/retract $communityId :community/url \"http://example.com\"]]"
+        conn.transact(Util.read(retract)).get()
+        assert fooCommunityUrl(conn.db()) == null
     }
 
 }
