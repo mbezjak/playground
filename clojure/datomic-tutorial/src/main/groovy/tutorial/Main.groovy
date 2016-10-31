@@ -65,6 +65,8 @@ class Main {
         insertNew(conn)
         assert count(conn.db()) == 259
         retractUrl(conn)
+        update(conn)
+        retractEntity(conn)
     }
 
     private static void simpleFind(db) {
@@ -342,6 +344,43 @@ class Main {
         def retract = "[[:db/retract $communityId :community/url \"http://example.com\"]]"
         conn.transact(Util.read(retract)).get()
         assert fooCommunityUrl(conn.db()) == null
+    }
+
+    private static void update(conn) {
+        assert fooCommunityUrl(conn.db()) == null
+        def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+
+        def update = "[{:db/id $communityId :community/url \"http://another.example.com\"}]"
+        conn.transact(Util.read(update)).get()
+        assert fooCommunityUrl(conn.db()) == 'http://another.example.com'
+
+        def updateAgain = "[[:db/add $communityId :community/url \"http://again.example.com\"]]"
+        conn.transact(Util.read(updateAgain)).get()
+        assert fooCommunityUrl(conn.db()) == 'http://again.example.com'
+
+        def addCategory = "[{:db/id $communityId :community/category \"New\"}]"
+        conn.transact(Util.read(addCategory)).get()
+        def queryForCategory = '[:find [?c ...] :where [?e :community/name "Foo"] [?e :community/category ?c]]'
+        assert Peer.query(queryForCategory, conn.db()) as Set == ['Example users', 'New'] as Set
+    }
+
+    private static int countFooCommunity(db) {
+        def query = """
+            [:find ?e
+             :where
+             [?e :community/name "Foo"]]
+        """
+
+        Peer.query(query, db).size()
+    }
+
+    private static void retractEntity(conn) {
+        assert countFooCommunity(conn.db()) == 1
+        def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+
+        def retract = "[[:db.fn/retractEntity $communityId]]"
+        conn.transact(Util.read(retract)).get()
+        assert countFooCommunity(conn.db()) == 0
     }
 
 }
