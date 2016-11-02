@@ -66,7 +66,10 @@ class Main {
         assert count(conn.db()) == 259
         retractUrl(conn)
         update(conn)
+        replaceCategory(conn)
         retractEntity(conn)
+
+        Peer.shutdown(true)
     }
 
     private static void simpleFind(db) {
@@ -372,6 +375,34 @@ class Main {
         """
 
         Peer.query(query, db).size()
+    }
+
+    private static void replaceCategory(conn) {
+        // http://stackoverflow.com/questions/36356933/updating-transaction-in-datomic-for-an-attribute-that-has-many-cardinality
+        def fn = """
+            [{:db/ident :bsu.fns/replace-to-many-scalars,
+              :db/doc "Given an entity's lookup ref, a to-many (scalar) attribute, and a list of new values,
+             yields a transaction that replaces the old values by new ones"
+              :db/id #db/id[:db.part/user],
+              :db/fn #db/fn {
+                   :lang :clojure,
+                   :imports [],
+                   :requires [[datomic.api :as d]],
+                   :params [db entid attr new-vals],
+                   :code (let [old-vals (if-let [e (d/entity db entid)] (get e attr) ())
+                               to-remove (remove (set (seq new-vals)) old-vals)]
+                           (concat
+                             (for [ov to-remove] [:db/retract entid attr ov])
+                             (for [nv new-vals] [:db/add entid attr nv]))
+                           )}}]
+        """
+        conn.transact(Util.readAll(new StringReader(fn)).get(0)).get()
+
+        def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+        def replace = "[[:bsu.fns/replace-to-many-scalars $communityId :community/category [\"New\"]]]"
+        conn.transact(Util.read(replace)).get()
+        def queryForCategory = '[:find [?c ...] :where [?e :community/name "Foo"] [?e :community/category ?c]]'
+        assert Peer.query(queryForCategory, conn.db()) as Set == ['New'] as Set
     }
 
     private static void retractEntity(conn) {
