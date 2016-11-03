@@ -67,6 +67,7 @@ class Main {
         retractUrl(conn)
         update(conn)
         replaceCategory(conn)
+        replaceEntity(conn)
         retractEntity(conn)
 
         Peer.shutdown(true)
@@ -403,6 +404,49 @@ class Main {
         conn.transact(Util.read(replace)).get()
         def queryForCategory = '[:find [?c ...] :where [?e :community/name "Foo"] [?e :community/category ?c]]'
         assert Peer.query(queryForCategory, conn.db()) as Set == ['New'] as Set
+    }
+
+    private static void replaceEntity(conn) {
+        def fn = """
+            [{:db/ident :fns/replace-entity,
+              :db/id #db/id[:db.part/user],
+              :db/fn #db/fn {
+                   :lang :clojure,
+                   :imports [],
+                   :requires [[datomic.api :as d]],
+                   :params [db entid attrs],
+                   :code (let [to-remove (if-let [e (d/entity db entid)] (filter (fn [[key value]] (not= key :db/id)) e) ())]
+                           (concat
+                             (for [[key value] to-remove]
+                                 (if (coll? value)
+                                     [:bsu.fns/replace-to-many-scalars entid key []]
+                                     [:db/retract entid key value]))
+                             [(merge {:db/id entid} attrs)])
+                           )}}]
+        """
+        conn.transact(Util.readAll(new StringReader(fn)).get(0)).get()
+
+        def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+        def newEntity = """
+            [[:fns/replace-entity $communityId {
+              :community/name "Foo"
+              :community/url "http://replaced.example.com"
+              :community/neighborhood [:neighborhood/name "Alki"]
+              :community/category ["Replaced"]
+              :community/orgtype :community.orgtype/community
+              :community/type :community.type/email-list
+            }]]
+        """
+        conn.transact(Util.readAll(new StringReader(newEntity)).get(0)).get()
+
+def e = conn.db().entity(communityId)
+e.keySet().each { key ->
+    println "$key = ${e.get(key)}"
+}
+
+        assert fooCommunityUrl(conn.db()) == 'http://replaced.example.com'
+        def queryForCategory = '[:find [?c ...] :where [?e :community/name "Foo"] [?e :community/category ?c]]'
+        assert Peer.query(queryForCategory, conn.db()) as Set == ['Replaced'] as Set
     }
 
     private static void retractEntity(conn) {
