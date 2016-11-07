@@ -415,12 +415,13 @@ class Main {
                    :imports [],
                    :requires [[datomic.api :as d]],
                    :params [db entid attrs],
-                   :code (let [to-remove (if-let [e (d/entity db entid)] (filter (fn [[key value]] (not= key :db/id)) e) ())]
+                   :code (let [to-remove (if-let [e (d/entity db entid)] (filter (comp not #{:db/id :community/name :community/neighborhood} key) e) [])]
                            (concat
                              (for [[key value] to-remove]
-                                 (if (coll? value)
-                                     [:bsu.fns/replace-to-many-scalars entid key []]
-                                     [:db/retract entid key value]))
+                                 (cond
+                                   (instance? datomic.Entity value) [:db/retract entid key (:db/id value)]
+                                   (or (sequential? value) (set? value)) [:bsu.fns/replace-to-many-scalars entid key []]
+                                   :else [:db/retract entid key value]))
                              [(merge {:db/id entid} attrs)])
                            )}}]
         """
