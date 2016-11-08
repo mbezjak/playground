@@ -415,7 +415,12 @@ class Main {
                    :imports [],
                    :requires [[datomic.api :as d]],
                    :params [db entid attrs],
-                   :code (let [to-remove (if-let [e (d/entity db entid)] (filter (comp not #{:db/id :community/name :community/neighborhood} key) e) [])]
+                   :code (let [to-remove (if-let [e (d/entity db entid)]
+                                (->> e
+                                     (filter (comp not #{:db/id} key))
+                                     (filter (fn [[key value]]
+                                               (not= (if (instance? datomic.Entity value) (:db/id value) value) (get attrs key)))))
+                                [])]
                            (concat
                              (for [[key value] to-remove]
                                  (cond
@@ -428,11 +433,12 @@ class Main {
         conn.transact(Util.readAll(new StringReader(fn)).get(0)).get()
 
         def communityId = Peer.query('[:find ?e . :where [?e :community/name "Foo"]]', conn.db())
+        def neighborhoodId = Peer.query('[:find ?n . :where [?e :community/name "Foo"] [?c :community/neighborhood ?n] [?n :neighborhood/name "Alki"]]', conn.db())
         def newEntity = """
             [[:fns/replace-entity $communityId {
               :community/name "Foo"
               :community/url "http://replaced.example.com"
-              :community/neighborhood [:neighborhood/name "Alki"]
+              :community/neighborhood $neighborhoodId
               :community/category ["Replaced"]
               :community/orgtype :community.orgtype/community
               :community/type :community.type/email-list
