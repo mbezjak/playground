@@ -2,5 +2,6 @@
 build/
 target/
 
+.lein-repl-history
 *.hi
 *.o
