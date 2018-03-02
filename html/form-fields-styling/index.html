@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <link href="main.css" rel="stylesheet" media="screen" />
+    </head>
+
+    <body>
+        <div>
+            <button type="submit" disabled>Save draft disabled</button>
+            <button type="submit">Save draft enabled</button>
+        </div>
+        <div>
+            <p>
+                <label for="email" >E-mail:</label>
+                <input type="email" id="email" name="email" placeholder="example: jane.doe@example.com" required>
+            </p>
+        </div>
+        <div>
+            <p>
+                <label for="select" >Select:</label>
+                <select id="select">
+                    <option value="a">A</option>
+                    <option value="b">B</option>
+                </select>
+            </p>
+        </div>
+        <div>
+            <p>
+                <input id="radioa" type="radio" name="radio" checked> <label for="radioa">A</label>
+                <input id="radiob" type="radio" name="radio"><label for="radiob">B</label>
+            </p>
+        </div>
+        <div>
+            <p>
+                <label for="picknum">Enter a number from 1-100</label>
+                <input type="number" min="1" max="100" id="picknum" name="picknum" step="1">
+            </p>
+        </div>
+    </body>
+</html>

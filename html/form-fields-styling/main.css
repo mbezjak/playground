@@ -1,0 +1,48 @@
+button:disabled {
+    opacity: .5;
+}
+
+button:focus {
+    border: 3px solid blue;
+}
+
+input:required {
+    border: 1px solid #ffc107;
+}
+
+select:optional {
+    border: 3px solid #ccc;
+}
+
+[type=radio] { opacity: 0; }
+
+[type=radio] + label::before {
+    background: #fff;
+    content: '';
+    display: inline-block;
+    border: 1px solid #444;
+    height: 1.2rem;
+    margin-right: 1em;
+    vertical-align: middle;
+    width: 1.2rem;
+}
+
+[type=radio]:checked + label::before {
+    background: #4caf50;
+}
+
+[type=radio] + label:hover {
+    font-weight: bold;
+}
+
+:out-of-range {
+    background: #ffeb3b;
+}
+
+:in-range {
+    background: #baf2ba;
+}
+
+:focus:invalid {
+    background: #febdab;
+}
