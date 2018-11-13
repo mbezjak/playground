@@ -25,8 +25,23 @@ fn gen_pi_nilakantha_procedural() -> f64 {
     pi
 }
 
+extern crate rug;
+use rug::Integer;
+use rug::Float;
+fn gen_pi_nilakantha_arbitrary() -> Float {
+    let n = 1000000;
+    let mut s = Float::with_val(53, 1);
+    let mut pi = Float::with_val(103, 3);
+    for i in (2..=n*2).step_by(2) {
+        pi = pi + Float::with_val(53, &s) * Float::with_val(53, 4) / (Integer::from(i) * (i+1) * (i+2));
+        s = -s;
+    }
+    pi
+}
+
 fn main() {
-    println!("PI in rust       {:.20}", std::f64::consts::PI);
-    println!("PI by Nilakantha {:.20}", gen_pi_nilakantha_procedural());
-    println!("PI by Viete      {:.20}", gen_pi_viete_procedural());
+    println!("PI in rust           {:.20}", std::f64::consts::PI);
+    println!("PI by Nilakantha arb {:.20}", gen_pi_nilakantha_arbitrary());
+    println!("PI by Nilakantha     {:.20}", gen_pi_nilakantha_procedural());
+    println!("PI by Viete          {:.20}", gen_pi_viete_procedural());
 }

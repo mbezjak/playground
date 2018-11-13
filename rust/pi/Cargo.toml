@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["Miro Bezjak <bezjak.miro@gmail.com>"]
 
 [dependencies]
+rug = "1.2.2"
