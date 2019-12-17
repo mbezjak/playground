@@ -29,7 +29,7 @@ fn chudnovsky() -> Float {
         K = K + 12;
         S = S + (Float::with_val(3330, &M) * Integer::from(&L)) / Integer::from(&X);
     }
-    let C = Float::with_val(3330, 10005) * 426880;
+    let C = Float::with_val(3330, 10005).sqrt() * 426880;
     C / S
 }
 
