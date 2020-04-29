@@ -1,1 +1,3 @@
-*.s
+vulnerable
+shellcode.bin
+shellcode.o
