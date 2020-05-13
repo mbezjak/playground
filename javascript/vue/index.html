@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Trying vue</title>
+        <style>
+         .negative {
+             color: red;
+         }
+         .positive {
+             color: green;
+         }
+        </style>
+    </head>
+
+    <body>
+        <div id="app">
+            <span v-bind:class="{negative: isNegative, positive: isPositive}">Counter: {{ counter }}</span>
+            <button v-on:click="inc">+1</button>
+            <button v-on:click="dec">-1</button>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script>
+         new Vue({
+             el: '#app',
+             data: {
+                 counter: 0
+             },
+             methods: {
+                 inc: function() {
+                     this.counter += 1;
+                 },
+                 dec: function() {
+                     this.counter -= 1;
+                 }
+             },
+             computed: {
+                 isPositive : function() {
+                     return this.counter > 0;
+                 },
+                 isNegative : function() {
+                     return this.counter < 0;
+                 }
+             }
+         });
+        </script>
+    </body>
+</html>
