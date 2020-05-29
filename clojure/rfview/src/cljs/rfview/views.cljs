@@ -15,3 +15,8 @@
      [:button
       {:on-click #(re-frame/dispatch [::events/delete-item 0])}
       "Delete 1st"]]))
+
+(comment
+  (re-frame/dispatch [::events/delete-item 1])
+  (re-frame/dispatch [::events/initialize-db])
+  )

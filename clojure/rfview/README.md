@@ -22,6 +22,7 @@ you.
   - CLJS compilation, REPL, & hot reload: [`shadow-cljs`](https://github.com/thheller/shadow-cljs)
 * Development tools
   - Debugging: [CLJS DevTools](https://github.com/binaryage/cljs-devtools)
+  - Emacs integration: [CIDER](https://github.com/clojure-emacs/cider)
 
 #### Directory structure
 
@@ -119,7 +120,19 @@ Opening the app in your browser starts a
 [ClojureScript browser REPL](https://clojurescript.org/reference/repl#using-the-browser-as-an-evaluation-environment),
 to which you may now connect.
 
-#### Connecting to the browser REPL from your editor
+#### Connecting to the browser REPL from Emacs with CIDER
+
+Connect to the browser REPL:
+```
+M-x cider-jack-in-cljs
+```
+
+See
+[Shadow CLJS User's Guide: Emacs/CIDER](https://shadow-cljs.github.io/docs/UsersGuide.html#cider)
+for more information. Note that the mentioned [`.dir-locals.el`](.dir-locals.el) file has already
+been created for you.
+
+#### Connecting to the browser REPL from other editors
 
 See
 [Shadow CLJS User's Guide: Editor Integration](https://shadow-cljs.github.io/docs/UsersGuide.html#_editor_integration).
