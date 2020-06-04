@@ -8,12 +8,12 @@
  (fn [_ _]
    db/default-db))
 
-(defn vec-remove
-  "remove elem in coll"
-  [pos coll]
-  (vec (concat (subvec coll 0 pos) (subvec coll (inc pos)))))
+(re-frame/reg-event-db
+ ::show-details
+ (fn [db [_ id]]
+   (assoc db :render {:type :form :id id})))
 
 (re-frame/reg-event-db
- ::delete-item
- (fn [db [_ index]]
-   {:items (vec-remove index (:items db))}))
+ ::show-grid
+ (fn [db _]
+   (assoc db :render {:type :grid})))
