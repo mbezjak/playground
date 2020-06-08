@@ -4,22 +4,19 @@
    [rfview.subs :as subs]
    [rfview.events :as events]))
 
-(defn render-row [row]
-  ^{:key (:id row)}
-  [:tr {:on-click #(re-frame/dispatch [::events/show-details (:id row)])}
-   [:td (:id row)]
-   [:td (:naziv row)]])
+(defn render-row [id row]
+  ^{:key id}
+  [:tr {:on-click #(re-frame/dispatch [::events/show-details id])}
+   (map (fn [col] [:td col]) row)])
 
 (defn grid []
-  (let [data @(re-frame/subscribe [::subs/data])
-        headers @(re-frame/subscribe [::subs/headers])]
+  (let [{:keys [headers rows]} @(re-frame/subscribe [::subs/table])]
     [:table
      [:thead
       [:tr
-       [:th (:id headers)]
-       [:th (:naziv headers)]]]
+       (map (fn [h] [:th h]) headers)]]
      [:tbody
-      (map render-row data)]]))
+      (map (fn [row] (render-row (first row) row)) rows)]]))
 
 (defn form [id]
   (let [row @(re-frame/subscribe [::subs/row id])]
@@ -29,10 +26,10 @@
       "back"]
      [:form
       [:label
-       "ID: "
+       [:span "ID:"]
        [:input {:type "textfield" :name "id" :read-only true :value (:id row)}]]
       [:label
-       "Naziv: "
+       [:span "Naziv:"]
        [:input {:type "textfield" :name "naziv" :read-only true :value (:naziv row)}]]]]))
 
 (defn main-panel []

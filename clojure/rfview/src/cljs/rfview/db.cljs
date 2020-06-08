@@ -1,8 +1,8 @@
 (ns rfview.db)
 
 (def default-db
-  {:headers {:id "ID"
-             :naziv "Naziv"}
+  {:headers [{:path :id :name "ID"}
+             {:path :naziv :name "Naziv"}]
    :data [{:id "004" :naziv "AFGANISTAN"}
           {:id "040" :naziv "AUSTRIJA"}
           {:id "076" :naziv "BRAZIL"}

@@ -4,14 +4,15 @@
    [rfview.db :as db]))
 
 (re-frame/reg-sub
- ::data
+ ::table
  (fn [db]
-   (:data db)))
-
-(re-frame/reg-sub
- ::headers
- (fn [db]
-   (:headers db)))
+   (let [headers (:headers db)
+         data (:data db)
+         paths (map :path headers)]
+     {:headers (map :name headers)
+      :rows (for [row data]
+              (for [p paths]
+                (get row p)))})))
 
 (re-frame/reg-sub
  ::render-type
