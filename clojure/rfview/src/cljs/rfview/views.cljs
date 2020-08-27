@@ -18,19 +18,19 @@
      [:tbody
       (map (fn [row] (render-row (first row) row)) rows)]]))
 
+(defn render-field [{:keys [label name value]}]
+  [:label
+   [:span label]
+   [:input {:type "textfield" :name name :read-only true :value value}]])
+
 (defn form [id]
-  (let [row @(re-frame/subscribe [::subs/row id])]
+  (let [fields @(re-frame/subscribe [::subs/fields id])]
     [:div
      [:button.back
       {:on-click #(re-frame/dispatch [::events/show-grid])}
       "back"]
      [:form
-      [:label
-       [:span "ID:"]
-       [:input {:type "textfield" :name "id" :read-only true :value (:id row)}]]
-      [:label
-       [:span "Naziv:"]
-       [:input {:type "textfield" :name "naziv" :read-only true :value (:naziv row)}]]]]))
+      (map render-field fields)]]))
 
 (defn main-panel []
   (let [type @(re-frame/subscribe [::subs/render-type])]

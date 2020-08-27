@@ -25,6 +25,10 @@
    (get-in db [:render :id])))
 
 (re-frame/reg-sub
- ::row
+ ::fields
  (fn [db [_ id]]
-   (db/find-row db id)))
+   (let [row (db/find-row db id)]
+     (for [[key value] row]
+       {:label (:name (db/find-header db key))
+        :name (name key)
+        :value value}))))

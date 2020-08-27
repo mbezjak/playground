@@ -22,3 +22,8 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
   (mount-root))
+
+(comment
+  (deref re-frame.db/app-db)
+  (re-frame/dispatch [:rfview.events/show-grid])
+  (re-frame/dispatch [:rfview.events/show-details "040"]))

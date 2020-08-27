@@ -13,6 +13,11 @@
   (let [data (:data db)]
     (some #(when (= id (:id %)) %) data)))
 
+(defn find-header [db id]
+  (let [headers (:headers db)]
+    (some #(when (= id (:path %)) %) headers)))
+
 (comment
   (find-row default-db "191")
+  (find-header default-db :id)
   )
