@@ -17,3 +17,9 @@
  ::show-grid
  (fn [db _]
    (assoc db :render {:type :grid})))
+
+(re-frame/reg-event-db
+ ::filter
+ (fn [db [_ path value]]
+   (assoc-in db [:render :filter] {:path path
+                                   :value value})))

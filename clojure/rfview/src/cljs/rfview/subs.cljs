@@ -3,13 +3,19 @@
    [re-frame.core :as re-frame]
    [rfview.db :as db]))
 
+(defn add-filter-value [h {:keys [path value]}]
+  (if (= path (:path h))
+    (assoc h :filter-value value)
+    h))
+
 (re-frame/reg-sub
  ::table
  (fn [db]
-   (let [headers (:headers db)
-         data (:data db)
+   (let [filter (-> db :render :filter)
+         headers (:headers db)
+         data (db/filter-data db filter)
          paths (map :path headers)]
-     {:headers (map :name headers)
+     {:headers (map #(add-filter-value % filter) headers)
       :rows (for [row data]
               (for [p paths]
                 (get row p)))})))

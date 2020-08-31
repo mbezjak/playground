@@ -7,14 +7,23 @@
 (defn render-row [id row]
   ^{:key id}
   [:tr {:on-click #(re-frame/dispatch [::events/show-details id])}
-   (map (fn [col] [:td col]) row)])
+   (map (fn [col] ^{:key col} [:td col]) row)])
+
+(defn render-header [{:keys [path name filter-value]}]
+  ^{:key name}
+  [:th
+   [:p name]
+   [:input {:type "textfield"
+            :on-change (fn [e]
+                         (re-frame/dispatch [::events/filter path (-> e .-target .-value)]))
+            :value filter-value}]])
 
 (defn grid []
   (let [{:keys [headers rows]} @(re-frame/subscribe [::subs/table])]
     [:table
      [:thead
       [:tr
-       (map (fn [h] [:th h]) headers)]]
+       (map render-header headers)]]
      [:tbody
       (map (fn [row] (render-row (first row) row)) rows)]]))
 
