@@ -46,3 +46,15 @@
     (case type
       :grid [grid]
       :form [form @(re-frame/subscribe [::subs/render-id])])))
+
+(defn navigation []
+  [:div.navigation
+   [:b "Navigation"]
+   [:ul
+    [:li [:a {:href "#" :on-click #(re-frame/dispatch [::events/show-grid])}
+          "Countries"]]]])
+
+(defn app []
+  [:div.app
+   [navigation]
+   [main-panel]])
