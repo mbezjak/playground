@@ -7,7 +7,40 @@
    :data [{:id "004" :naziv "AFGANISTAN"}
           {:id "040" :naziv "AUSTRIJA"}
           {:id "076" :naziv "BRAZIL"}
-          {:id "191" :naziv "HRVATSKA"}]
+          {:id "100" :naziv "BUGARSKA"}
+          {:id "104" :naziv "MIJANMAR"}
+          {:id "120" :naziv "KAMERUN"}
+          {:id "124" :naziv "KANADA"}
+          {:id "156" :naziv "KINA"}
+          {:id "191" :naziv "HRVATSKA"}
+          {:id "196" :naziv "CIPAR"}
+          {:id "203" :naziv "ČEŠKA"}
+          {:id "208" :naziv "DANSKA"}
+          {:id "231" :naziv "ETIOPIJA"}
+          {:id "232" :naziv "ERITREJA"}
+          {:id "233" :naziv "ESTONIJA"}
+          {:id "250" :naziv "FRANCUSKA"}
+          {:id "266" :naziv "GABON"}
+          {:id "268" :naziv "GRUZIJA"}
+          {:id "410" :naziv "KOREJA, REPUBLIKA (JUŽNA KOREJA)"}
+          {:id "422" :naziv "LIBANON"}
+          {:id "426" :naziv "LESOTO"}
+          {:id "428" :naziv "LETONIJA"}
+          {:id "450" :naziv "MADAGASKAR"}
+          {:id "454" :naziv "MALAVI"}
+          {:id "458" :naziv "MALEZIJA"}
+          {:id "462" :naziv "MALDIVI"}
+          {:id "466" :naziv "MALI"}
+          {:id "470" :naziv "MALTA"}
+          {:id "686" :naziv "SENEGAL"}
+          {:id "688" :naziv "SRBIJA"}
+          {:id "690" :naziv "SEJŠELI"}
+          {:id "694" :naziv "SIJERA LEONE"}
+          {:id "752" :naziv "ŠVEDSKA"}
+          {:id "756" :naziv "ŠVICARSKA"}
+          {:id "807" :naziv "MAKEDONIJA"}
+          {:id "818" :naziv "EGIPAT"}
+          {:id "826" :naziv "VELIKA BRITANIJA"}]
    :render {:type :grid}})
 
 (defn find-row [db id]
