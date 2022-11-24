@@ -1,0 +1,2 @@
+{:deps {com.clojure-goes-fast/clj-memory-meter {:mvn/version "0.2.1"}}
+ :jvm-opts ["-Djdk.attach.allowAttachSelf"]}

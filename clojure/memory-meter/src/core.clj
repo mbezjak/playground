@@ -1,0 +1,23 @@
+(ns core)
+
+;; https://github.com/clojure-goes-fast/clj-memory-meter
+(require '[clj-memory-meter.core :as mm])
+(import [java.util ArrayList HashMap LinkedHashMap])
+
+(mm/measure "Hello world")
+(mm/measure "Hello, world!")
+(mm/measure "Hello, world!!")
+(mm/measure [])
+(mm/measure {})
+(mm/measure (ArrayList.))
+(mm/measure (HashMap.))
+(mm/measure (LinkedHashMap.))
+(mm/measure (into {} (map #(vector % (str %)) (range 100))))
+(mm/measure (repeatedly 100 #(String. "hello")))
+(mm/measure (vec (repeatedly 100 #(String. "hello"))))
+(mm/measure (object-array (repeatedly 100 #(String. "hello"))))
+(mm/measure (object-array (repeatedly 100 #(String. "hello"))) :shallow true)
+(mm/measure (object-array (repeatedly 100 #(String. "hello"))) :bytes true)
+(mm/measure (object-array (repeatedly 100 #(String. "hello"))) :debug true)
+(mm/measure (vec (repeat 20 "hello")) :debug true)
+(mm/measure (apply list (range 4)) :debug true)
