@@ -1,0 +1,1 @@
+{:deps {clj-pdf {:mvn/version "2.2.30"}}}
