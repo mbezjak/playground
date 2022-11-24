@@ -1,0 +1,1 @@
+{:deps {funcool/cats {:mvn/version "2.2.0"}}}
