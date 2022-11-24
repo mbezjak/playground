@@ -1,6 +1,7 @@
 .gradle/
 build/
 target/
+.cpcache/
 
 .lein-repl-history
 .nrepl-port
