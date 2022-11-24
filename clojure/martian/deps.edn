@@ -1,0 +1,2 @@
+{:deps {com.github.oliyh/martian {:mvn/version "0.1.21"}
+        com.github.oliyh/martian-clj-http {:mvn/version "0.1.21"}}}
